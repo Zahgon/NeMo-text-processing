@@ -33,17 +33,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file, keep_punct_add_end: bool = False):
-            whitelist = load_labels(file)
-            if input_case == INPUT_LOWER_CASED:
-                whitelist = [[x.lower(), y] for x, y in whitelist]
-            else:
-                whitelist = [[x, y] for x, y in whitelist]
-
-            if keep_punct_add_end:
-                whitelist.extend(augment_labels_with_punct_at_end(whitelist))
-
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist/abbreviations.tsv"))
 

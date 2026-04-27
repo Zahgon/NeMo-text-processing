@@ -1,5 +1,5 @@
 # Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
-# Copyright (c) 2023, Jim O'Regan for Språkbanken Tal
+# Copyright (c) 2023, Jim O'Regan for SprÃ¥kbanken Tal
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,78 +37,7 @@ def get_quantity(
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    quantities = pynini.string_file(get_abs_path("data/numbers/millions.tsv"))
-    quantities_abbr = pynini.string_file(get_abs_path("data/numbers/millions_abbr.tsv"))
-
-    quantities_pl = quantities + "er"
-    quantities_pl |= quantities @ pynini.cdrewrite(pynini.cross("", "er"), "", "[EOS]", NEMO_SIGMA)
-
-    if include_abbr or not itn:
-        quantity = quantities | quantities_abbr
-        quantities_pl |= quantities_abbr + pynutil.insert("er")
-    else:
-        quantity = quantities
-
-    one_en = pynini.cross("1", "en")
-    one_ett = pynini.cross("1", "ett")
-    if itn:
-        # accept both here, even if wrong
-        one_en = pynini.cross("en", "1")
-        one_en |= pynini.cross("ett", "1")
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + cardinal_up_to_thousand
-        + pynutil.insert("\"")
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynutil.insert(" quantity: \"")
-        + quantities_pl
-        + pynutil.insert("\"")
-    )
-    if not itn:
-        res |= (
-            pynutil.insert("integer_part: \"")
-            + cardinal_up_to_thousand_ett
-            + pynutil.insert("\"")
-            + pynini.closure(pynutil.delete(" "), 0, 1)
-            + pynutil.insert(" quantity: \"")
-            + "tusen"
-            + pynutil.insert("\"")
-        )
-        res |= (
-            pynutil.insert("integer_part: \"")
-            + one_ett
-            + pynutil.insert("\"")
-            + pynini.closure(pynutil.delete(" "), 0, 1)
-            + pynutil.insert(" quantity: \"")
-            + "tusen"
-            + pynutil.insert("\"")
-        )
-    res |= (
-        pynutil.insert("integer_part: \"")
-        + one_en
-        + pynutil.insert("\"")
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynutil.insert(" quantity: \"")
-        + quantity
-        + pynutil.insert("\"")
-    )
-    res |= (
-        decimal
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynutil.insert(" quantity: \"")
-        + quantities_pl
-        + pynutil.insert("\"")
-    )
-    if not itn:
-        res |= (
-            decimal_ett
-            + pynini.closure(pynutil.delete(" "), 0, 1)
-            + pynutil.insert(" quantity: \"")
-            + "tusen"
-            + pynutil.insert("\"")
-        )
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

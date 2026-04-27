@@ -234,16 +234,7 @@ class MeasureFst(GraphFst):
         Args:
             cardinal: cardinal GraphFst
         """
-        range_graph = cardinal + pynini.cross(pynini.union("-", " - "), " to ") + cardinal
-
-        for x in [" x ", "x"]:
-            range_graph |= cardinal + pynini.cross(x, " by ") + cardinal
-            if not self.deterministic:
-                range_graph |= cardinal + pynini.cross(x, " times ") + pynini.closure(cardinal, 0, 1)
-
-        for x in ["*", " * "]:
-            range_graph |= cardinal + pynini.cross(x, " times ") + cardinal
-        return range_graph.optimize()
+        pass
 
     def get_address_graph(self, cardinal):
         """
@@ -254,79 +245,4 @@ class MeasureFst(GraphFst):
                 { integer: "two seven eight eight San Tomas Expressway Santa Clara California nine five zero five one" }
                  preserve_order: true
         """
-        ordinal_verbalizer = OrdinalVerbalizer().graph
-        ordinal_tagger = OrdinalTagger(cardinal=cardinal).graph
-        ordinal_num = pynini.compose(
-            pynutil.insert('integer: "') + ordinal_tagger + pynutil.insert('"'),
-            ordinal_verbalizer,
-        )
-
-        address_num = NEMO_DIGIT ** (1, 2) @ cardinal.graph_hundred_component_at_least_one_none_zero_digit
-        address_num += insert_space + NEMO_DIGIT**2 @ (
-            pynini.closure(pynini.cross("0", "zero "), 0, 1)
-            + cardinal.graph_hundred_component_at_least_one_none_zero_digit
-        )
-        # to handle the rest of the numbers
-        address_num = pynini.compose(NEMO_DIGIT ** (3, 4), address_num)
-        address_num = plurals._priority_union(address_num, cardinal.graph, NEMO_SIGMA)
-
-        direction = (
-            pynini.cross("E", "East")
-            | pynini.cross("S", "South")
-            | pynini.cross("W", "West")
-            | pynini.cross("N", "North")
-        ) + pynini.closure(pynutil.delete("."), 0, 1)
-
-        direction = pynini.closure(pynini.accep(NEMO_SPACE) + direction, 0, 1)
-        address_words = get_formats(get_abs_path("data/address/address_word.tsv"))
-        address_words = (
-            pynini.accep(NEMO_SPACE)
-            + (pynini.closure(ordinal_num, 0, 1) | NEMO_UPPER + pynini.closure(NEMO_ALPHA, 1))
-            + NEMO_SPACE
-            + pynini.closure(NEMO_UPPER + pynini.closure(NEMO_ALPHA) + NEMO_SPACE)
-            + address_words
-        )
-
-        city = pynini.closure(NEMO_ALPHA | pynini.accep(NEMO_SPACE), 1)
-        city = pynini.closure(pynini.accep(",") + pynini.accep(NEMO_SPACE) + city, 0, 1)
-
-        states = load_labels(get_abs_path("data/address/state.tsv"))
-
-        additional_options = []
-        for x, y in states:
-            additional_options.append((x, f"{y[0]}.{y[1:]}"))
-        states.extend(additional_options)
-        state_graph = pynini.string_map(states)
-        state = pynini.invert(state_graph)
-        state = pynini.closure(pynini.accep(",") + pynini.accep(NEMO_SPACE) + state, 0, 1)
-
-        zip_code = pynini.compose(NEMO_DIGIT**5, cardinal.single_digits_graph)
-        zip_code = pynini.closure(
-            pynini.closure(pynini.accep(","), 0, 1) + pynini.accep(NEMO_SPACE) + zip_code,
-            0,
-            1,
-        )
-
-        address = address_num + direction + address_words + pynini.closure(city + state + zip_code, 0, 1)
-
-        # Handles sentences ending in terminal period abbreviations, when followed by another sentence
-        # (e.g. Nancy lived on 1428 Elm St. It was a strange place-> Nancy lived on fourteen twenty eight Elm Street. It was a strange place.)
-
-        hyphen = pynini.accep("-")
-        alpha_chars = NEMO_ALPHA | hyphen
-
-        address_eos = (
-            address_num
-            + direction
-            + address_words
-            + pynini.accep(".")
-            + pynini.closure(NEMO_SPACE, 1, 2)
-            + NEMO_UPPER
-            + pynini.closure(alpha_chars)
-        )
-
-        address |= pynutil.add_weight(address_eos, -0.001)
-
-        address |= address_num + direction + address_words + pynini.closure(pynini.cross(".", ""), 0, 1)
-
-        return address
+        pass

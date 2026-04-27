@@ -18,45 +18,45 @@ import os
 # HEBREW CONSTANTS #
 ####################
 units_feminine_dict = {
-    "0": "אפס",
-    "1": "אחת",
-    "2": "שתיים",
-    "3": "שלוש",
-    "4": "ארבע",
-    "5": "חמש",
-    "6": "שש",
-    "7": "שבע",
-    "8": "שמונה",
-    "9": "תשע",
+    "0": "×�×¤×¡",
+    "1": "×�×—×ª",
+    "2": "×©×ª×™×™×�",
+    "3": "×©×œ×•×©",
+    "4": "×�×¨×‘×¢",
+    "5": "×—×ž×©",
+    "6": "×©×©",
+    "7": "×©×‘×¢",
+    "8": "×©×ž×•× ×”",
+    "9": "×ª×©×¢",
 }
 
 units_masculine_dict = {
-    "0": "אפס",
-    "1": "אחד",
-    "2": "שניים",
-    "3": "שלושה",
-    "4": "ארבעה",
-    "5": "חמישה",
-    "6": "שישה",
-    "7": "שבעה",
-    "8": "שמונה",
-    "9": "תשעה",
+    "0": "×�×¤×¡",
+    "1": "×�×—×“",
+    "2": "×©× ×™×™×�",
+    "3": "×©×œ×•×©×”",
+    "4": "×�×¨×‘×¢×”",
+    "5": "×—×ž×™×©×”",
+    "6": "×©×™×©×”",
+    "7": "×©×‘×¢×”",
+    "8": "×©×ž×•× ×”",
+    "9": "×ª×©×¢×”",
 }
 
 tens_dict = {
-    "2": "עשרים",
-    "3": "שלושים",
-    "4": "ארבעים",
-    "5": "חמישים",
-    "6": "שישים",
-    "7": "שבעים",
-    "8": "שמונים",
-    "9": "תשעים",
+    "2": "×¢×©×¨×™×�",
+    "3": "×©×œ×•×©×™×�",
+    "4": "×�×¨×‘×¢×™×�",
+    "5": "×—×ž×™×©×™×�",
+    "6": "×©×™×©×™×�",
+    "7": "×©×‘×¢×™×�",
+    "8": "×©×ž×•× ×™×�",
+    "9": "×ª×©×¢×™×�",
 }
 
 ten = {
-    "short": "עשר",
-    "long": "עשרה",
+    "short": "×¢×©×¨",
+    "long": "×¢×©×¨×”",
 }  # double pronunciation: short is 'eser' and 'asar', long is 'esre' and 'asara'
 
 
@@ -95,88 +95,22 @@ def augment_labels_with_punct_at_end(labels):
 
 def digit_by_digit(num):
 
-    dbd = [" ".join([units_feminine_dict[digit] for digit in num])]
-
-    # generate "1" as masculine and as feminine if exists
-    if units_feminine_dict["1"] in dbd[0]:
-        dbd.append(dbd[0].replace(units_feminine_dict["1"], units_masculine_dict["1"]))
-
-    return dbd
+    pass
 
 
 def integer_to_text(num, only_fem=False):
-    if isinstance(num, int):
-        num = str(num)
-    # number is zero
-    if num == len(num) * "0":
-        return ["אפס"]
-    else:
-        # remove leading zeros from number
-        num = num.lstrip("0")
-
-        # units
-        if len(num) == 1:
-            return _less_than_10(num, only_fem)
-
-        # tenths
-        elif len(num) == 2:
-            return _less_than_100(num, only_fem)
-
-        else:
-            raise Exception
+    pass
 
 
 def _less_than_10(num, only_fem=False):
     """
     Returns a list of all the possible names of a number in range 0-9
     """
-
-    if only_fem:
-        return [units_feminine_dict[num]]
-    else:
-        return [units_feminine_dict[num], units_masculine_dict[num]]
+    pass
 
 
 def _less_than_100(num, only_fem=False):
     """
     Returns a list of all the possible names of a number in range 0-99
     """
-
-    # init result
-    res = list()
-
-    # split number to digits
-    tens, units = num
-
-    # number is in range 0-9
-    if len(num) == 1:
-        res.extend(_less_than_10(num))
-
-    # number is in range 10-99
-    elif len(num) == 2:
-
-        if num == "10":
-            if only_fem:
-                res.extend([ten["short"]])
-            else:
-                res.extend([ten["long"], ten["short"]])
-
-        # number is in range 11-19
-        elif tens == "1":
-            res.append(f'{units_feminine_dict[num[1]]} {ten["long"]}')
-            if not only_fem:
-                res.append(f'{units_masculine_dict[num[1]]} {ten["short"]}')
-
-        else:
-
-            # number is in range 20-99, a multiplication of 10
-            if units == "0":
-                res.append(tens_dict[num[0]])
-
-            # number is in range 20-99, but not multiplication of 10
-            else:
-                res.append(f'{tens_dict[num[0]]} {"ו"}{units_feminine_dict[num[1]]}')
-                if not only_fem:
-                    res.append(f'{tens_dict[num[0]]} {"ו"}{units_masculine_dict[num[1]]}')
-
-    return res
+    pass

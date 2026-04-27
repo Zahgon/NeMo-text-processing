@@ -24,21 +24,15 @@ def _get_year_graph(graph_two_digits, graph_thousands):
     """
     Transducer for year, e.g. twenty twenty -> 2020
     """
-    year_graph = pynini.union(
-        (graph_two_digits + delete_space + graph_two_digits),
-        graph_thousands,  # 20 19, 40 12, 20 20
-    )  # 2012 - assuming no limit on the year
-
-    year_graph.optimize()
-    return year_graph
+    pass
 
 
 class DateFst(GraphFst):
     """
     Finite state transducer for classifying date in Hebrew,
-        e.g. אחד במאי אלף תשע מאות שמונים ושלוש -> date { day: "1" morphosyntactic_features: "ב" month: "5" year: "1983" }
-        e.g. מרץ אלף תשע מאות שמונים ותשע -> date { month: "מרץ" year: "1989" }
-        e.g. בינואר עשרים עשרים -> date { morphosyntactic_features: "ב" month: "ינואר" year: "2020" }
+        e.g. ×�×—×“ ×‘×ž×�×™ ×�×œ×£ ×ª×©×¢ ×ž×�×•×ª ×©×ž×•× ×™×� ×•×©×œ×•×© -> date { day: "1" morphosyntactic_features: "×‘" month: "5" year: "1983" }
+        e.g. ×ž×¨×¥ ×�×œ×£ ×ª×©×¢ ×ž×�×•×ª ×©×ž×•× ×™×� ×•×ª×©×¢ -> date { month: "×ž×¨×¥" year: "1989" }
+        e.g. ×‘×™× ×•×�×¨ ×¢×©×¨×™×� ×¢×©×¨×™×� -> date { morphosyntactic_features: "×‘" month: "×™× ×•×�×¨" year: "2020" }
 
     Args:
         cardinal: CardinalFst
@@ -75,7 +69,7 @@ class DateFst(GraphFst):
         year_prefix_graph = (
             pynutil.insert('morphosyntactic_features: "')
             + pynini.closure(prefix_graph, 0, 1)
-            + pynini.union("שנה", "שנת")
+            + pynini.union("×©× ×”", "×©× ×ª")
             + pynutil.insert('"')
         )
 

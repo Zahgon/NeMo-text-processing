@@ -35,95 +35,33 @@ digit = digit_without_shunya | shunya
 
 
 def get_context(keywords: list):
-    keywords = pynini.union(*keywords)
-
-    # Load Hindi digits from TSV files
-    hindi_digits = (
-        pynini.string_file(get_abs_path("data/numbers/digit.tsv"))
-        | pynini.string_file(get_abs_path("data/numbers/zero.tsv"))
-    ).project("output")
-
-    # Load English digits from TSV files
-    english_digits = (
-        pynini.string_file(get_abs_path("data/telephone/eng_digit.tsv"))
-        | pynini.string_file(get_abs_path("data/telephone/eng_zero.tsv"))
-    ).project("output")
-
-    all_digits = hindi_digits | english_digits
-
-    non_digit_char = pynini.difference(NEMO_CHAR, pynini.union(all_digits, NEMO_WHITE_SPACE))
-    word = pynini.closure(non_digit_char, 1) + NEMO_WHITE_SPACE
-    window = pynini.closure(word, 0, 5)
-    before = (keywords + window).optimize()
-    after = (window + keywords).optimize()
-
-    return before, after
+    pass
 
 
 def generate_context_graph(context_keywords, length):
-    context_before, context_after = get_context(context_keywords)
-    digits = pynini.closure(digit + delete_space, length - 1, length - 1) + digit
-
-    graph_after_context = digits + NEMO_WHITE_SPACE + context_after
-    graph_before_context = context_before + NEMO_WHITE_SPACE + digits
-    graph_without_context = digits
-
-    return (
-        pynutil.insert("number_part: \"")
-        + (graph_before_context | graph_after_context | graph_without_context)
-        + pynutil.insert("\" ")
-    ).optimize()
+    pass
 
 
 def generate_pincode(context_keywords):
-    return generate_context_graph(context_keywords, 6)
+    pass
 
 
 def generate_credit(context_keywords):
-    return generate_context_graph(context_keywords, 4)
+    pass
 
 
 def generate_mobile(context_keywords):
-    context_before, context_after = get_context(context_keywords)
-
-    country_code = pynini.cross("प्लस", "+") + pynini.closure(delete_space + digit, 2, 2) + NEMO_WHITE_SPACE
-    graph_country_code = (
-        pynutil.insert("country_code: \"")
-        + (context_before + NEMO_WHITE_SPACE) ** (0, 1)
-        + country_code
-        + pynutil.insert("\" ")
-    )
-
-    number_part = digit_without_shunya + delete_space + pynini.closure(digit + delete_space, 8, 8) + digit
-    graph_number = (
-        pynutil.insert("number_part: \"")
-        + number_part
-        + pynini.closure(NEMO_WHITE_SPACE + context_after, 0, 1)
-        + pynutil.insert("\" ")
-    )
-
-    graph = (graph_country_code + graph_number) | graph_number
-    return graph.optimize()
+    pass
 
 
 def generate_telephone(context_keywords):
-    context_before, context_after = get_context(context_keywords)
-
-    landline = shunya + delete_space + pynini.closure(digit + delete_space, 9, 9) + digit
-    landline_with_context_before = context_before + NEMO_WHITE_SPACE + landline
-    landline_with_context_after = landline + NEMO_WHITE_SPACE + context_after
-
-    return (
-        pynutil.insert("number_part: \"")
-        + (landline | landline_with_context_before | landline_with_context_after)
-        + pynutil.insert("\" ")
-    )
+    pass
 
 
 class TelephoneFst(GraphFst):
     """
     Finite state transducer for classifying telephone numbers, e.g.
-    e.g. प्लस इक्यानवे नौ आठ सात छह पांच चार तीन दो एक शून्य => tokens { name: "+९१ ९८७६५ ४३२१०" }
+    e.g. à¤ªà¥�à¤²à¤¸ à¤‡à¤•à¥�à¤¯à¤¾à¤¨à¤µà¥‡ à¤¨à¥Œ à¤†à¤  à¤¸à¤¾à¤¤ à¤›à¤¹ à¤ªà¤¾à¤‚à¤š à¤šà¤¾à¤° à¤¤à¥€à¤¨ à¤¦à¥‹ à¤�à¤• à¤¶à¥‚à¤¨à¥�à¤¯ => tokens { name: "+à¥¯à¥§ à¥¯à¥®à¥­à¥¬à¥« à¥ªà¥©à¥¨à¥§à¥¦" }
     Args:
         Cardinal: CardinalFst
     """

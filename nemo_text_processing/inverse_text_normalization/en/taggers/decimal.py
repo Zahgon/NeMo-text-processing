@@ -46,31 +46,7 @@ def get_quantity(
         cardinal_up_to_hundred: cardinal FST
         input_case: accepting either "lower_cased" or "cased" input.
     """
-    numbers = cardinal_up_to_hundred @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix_labels = load_labels(get_abs_path("data/numbers/thousands.tsv"))
-    suffix_labels = [x[0] for x in suffix_labels if x[0] != "thousand"]
-    suffix = pynini.union(*suffix_labels).optimize()
-
-    if input_case == INPUT_CASED:
-        suffix |= pynini.union(*[x[0].upper() + x[1:] for x in suffix_labels]).optimize()
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + (suffix | "thousand") + pynutil.insert("\"")
-
-    if input_case == INPUT_CASED:
-        res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + "Thousand" + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

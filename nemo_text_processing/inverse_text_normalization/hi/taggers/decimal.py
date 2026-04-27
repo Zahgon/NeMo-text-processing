@@ -38,46 +38,31 @@ def get_quantity(
 ) -> 'pynini.FstLike':
     """
     Returns FST that transforms either a cardinal or decimal followed by a quantity into a numeral,
-    e.g. दस लाख -> integer_part: "१॰" quantity: "लाख"
-    e.g. एक दशमलव पाँच लाख -> integer_part: "१" fractional_part: "५" quantity: "लाख"
+    e.g. à¤¦à¤¸ à¤²à¤¾à¤– -> integer_part: "à¥§à¥°" quantity: "à¤²à¤¾à¤–"
+    e.g. à¤�à¤• à¤¦à¤¶à¤®à¤²à¤µ à¤ªà¤¾à¤�à¤š à¤²à¤¾à¤– -> integer_part: "à¥§" fractional_part: "à¥«" quantity: "à¤²à¤¾à¤–"
 
     Args:
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
         input_case: accepting either "lower_cased" or "cased" input.
     """
-    numbers = cardinal_up_to_hundred @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix = pynini.string_file(get_abs_path("data/numbers/thousands.tsv"))
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + suffix + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal
-        Decimal point "." is determined by "दशमलव"
-            e.g. ऋण एक दशमलव दो छह -> decimal { negative: "true" integer_part: "१" morphosyntactic_features: "." fractional_part: "२६" }
+        Decimal point "." is determined by "à¤¦à¤¶à¤®à¤²à¤µ"
+            e.g. à¤‹à¤£ à¤�à¤• à¤¦à¤¶à¤®à¤²à¤µ à¤¦à¥‹ à¤›à¤¹ -> decimal { negative: "true" integer_part: "à¥§" morphosyntactic_features: "." fractional_part: "à¥¨à¥¬" }
 
 
         This decimal rule assumes that decimals can be pronounced as:
-        (a cardinal) + ('दशमलव') plus (any sequence of cardinals <१०००, including 'शून्य')
+        (a cardinal) + ('à¤¦à¤¶à¤®à¤²à¤µ') plus (any sequence of cardinals <à¥§à¥¦à¥¦à¥¦, including 'à¤¶à¥‚à¤¨à¥�à¤¯')
 
         Also writes large numbers in shortened form, e.g.
-            e.g. एक दशमलव दो छह लाख -> decimal { negative: "false" integer_part: "१" morphosyntactic_features: "." fractional_part: "२६" quantity: "लाख" }
-            e.g. दो लाख -> decimal { negative: "false" integer_part: "२" quantity: "लाख" }
-            e.g. एक अरब आठ सौ चौबीस लाख -> decimal { negative: "false" integer_part: "१८२४" quantity: "लाख" }
+            e.g. à¤�à¤• à¤¦à¤¶à¤®à¤²à¤µ à¤¦à¥‹ à¤›à¤¹ à¤²à¤¾à¤– -> decimal { negative: "false" integer_part: "à¥§" morphosyntactic_features: "." fractional_part: "à¥¨à¥¬" quantity: "à¤²à¤¾à¤–" }
+            e.g. à¤¦à¥‹ à¤²à¤¾à¤– -> decimal { negative: "false" integer_part: "à¥¨" quantity: "à¤²à¤¾à¤–" }
+            e.g. à¤�à¤• à¤…à¤°à¤¬ à¤†à¤  à¤¸à¥Œ à¤šà¥Œà¤¬à¥€à¤¸ à¤²à¤¾à¤– -> decimal { negative: "false" integer_part: "à¥§à¥®à¥¨à¥ª" quantity: "à¤²à¤¾à¤–" }
     Args:
         cardinal: CardinalFst
 
@@ -94,10 +79,10 @@ class DecimalFst(GraphFst):
         graph_decimal = pynini.closure(graph_decimal + delete_space) + graph_decimal
         self.graph = graph_decimal
 
-        point = pynutil.delete("दशमलव")
+        point = pynutil.delete("à¤¦à¤¶à¤®à¤²à¤µ")
 
         optional_graph_negative = pynini.closure(
-            pynutil.insert("negative: ") + pynini.cross("ऋण", "\"true\"") + delete_extra_space,
+            pynutil.insert("negative: ") + pynini.cross("à¤‹à¤£", "\"true\"") + delete_extra_space,
             0,
             1,
         )

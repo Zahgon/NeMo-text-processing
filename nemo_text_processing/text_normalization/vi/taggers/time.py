@@ -31,7 +31,7 @@ class TimeFst(GraphFst):
 
     Supports various formats including:
     - Digital formats: "8:30", "14:45", "5:20:35"
-    - Vietnamese formats: "14 giờ 30 phút", "2 giờ 15 phút 10 giây"
+    - Vietnamese formats: "14 giá»� 30 phÃºt", "2 giá»� 15 phÃºt 10 giÃ¢y"
     - Abbreviated formats: "9h", "9g", "14h30", "14g30", "3p20s"
     - With time zones: "8:23 gmt", "15h cst"
 
@@ -52,7 +52,7 @@ class TimeFst(GraphFst):
         minutes_seconds = pynini.union(*[str(x) for x in range(0, 60)])
 
         def label(name, graph):
-            return pynutil.insert(f'{name}: "') + graph + pynutil.insert('"')
+            pass
 
         hour = label('hours', delete_leading_zero @ hours @ cardinal_graph)
         minute = label('minutes', delete_leading_zero @ minutes_seconds @ cardinal_graph)
@@ -60,9 +60,9 @@ class TimeFst(GraphFst):
         zone = label('zone', convert_space(time_zone))
 
         h_suffix = pynini.union(pynutil.delete("h"), pynutil.delete("g"))
-        h_word = pynutil.delete(" giờ")
-        m_word = pynutil.delete(" phút")
-        s_word = pynutil.delete(" giây")
+        h_word = pynutil.delete(" giá»�")
+        m_word = pynutil.delete(" phÃºt")
+        s_word = pynutil.delete(" giÃ¢y")
 
         opt_zone_space = pynini.closure(pynini.accep(NEMO_SPACE) + zone, 0, 1)
         opt_zone = pynini.closure(zone, 0, 1)

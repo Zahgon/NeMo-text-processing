@@ -64,7 +64,7 @@ class InverseNormalizer(Normalizer):
                 VerbalizeFinalFst,
             )
 
-        elif lang == 'pt':  # Portuguese (Português)
+        elif lang == 'pt':  # Portuguese (PortuguÃªs)
             from nemo_text_processing.inverse_text_normalization.pt.taggers.tokenize_and_classify import ClassifyFst
             from nemo_text_processing.inverse_text_normalization.pt.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
@@ -81,7 +81,7 @@ class InverseNormalizer(Normalizer):
             from nemo_text_processing.inverse_text_normalization.de.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
             )
-        elif lang == 'fr':  # French (Français)
+        elif lang == 'fr':  # French (FranÃ§ais)
             from nemo_text_processing.inverse_text_normalization.fr.taggers.tokenize_and_classify import ClassifyFst
             from nemo_text_processing.inverse_text_normalization.fr.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
@@ -91,7 +91,7 @@ class InverseNormalizer(Normalizer):
             from nemo_text_processing.inverse_text_normalization.sv.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
             )
-        elif lang == 'vi':  # Vietnamese (Tiếng Việt)
+        elif lang == 'vi':  # Vietnamese (Tiáº¿ng Viá»‡t)
             from nemo_text_processing.inverse_text_normalization.vi.taggers.tokenize_and_classify import ClassifyFst
             from nemo_text_processing.inverse_text_normalization.vi.verbalizers.verbalize_final import (
                 VerbalizeFinalFst,
@@ -162,7 +162,7 @@ class InverseNormalizer(Normalizer):
 
         Returns converted list of input strings
         """
-        return self.normalize_list(texts=texts, verbose=verbose)
+        pass
 
     def inverse_normalize(self, text: str, verbose: bool) -> str:
         """
@@ -175,63 +175,11 @@ class InverseNormalizer(Normalizer):
 
         Returns: written form
         """
-        return self.normalize(text=text, verbose=verbose)
+        pass
 
 
 def parse_args():
-    parser = ArgumentParser()
-    input = parser.add_mutually_exclusive_group()
-    input.add_argument("--text", dest="input_string", help="input string", type=str)
-    input.add_argument("--input_file", dest="input_file", help="input file path", type=str)
-    parser.add_argument('--output_file', dest="output_file", help="output file path", type=str)
-    parser.add_argument(
-        "--language",
-        help="language",
-        choices=[
-            'en',
-            'de',
-            'es',
-            'pt',
-            'ru',
-            'fr',
-            'sv',
-            'vi',
-            'ar',
-            'es_en',
-            'zh',
-            'he',
-            'hi',
-            'hy',
-            'mr',
-            'ja',
-            'ko',
-        ],
-        default="en",
-        type=str,
-    )
-    parser.add_argument(
-        "--input_case",
-        help="Input text capitalization, set to 'cased' if text contains capital letters."
-        "This flag affects normalization rules applied to the text. Note, `lower_cased` won't lower case input.",
-        choices=[INPUT_CASED, INPUT_LOWER_CASED],
-        default=INPUT_LOWER_CASED,
-        type=str,
-    )
-    parser.add_argument(
-        "--whitelist",
-        help="Path to a file with with whitelist replacements," "e.g., inverse_normalization/en/data/whitelist.tsv",
-        default=None,
-        type=str,
-    )
-    parser.add_argument("--verbose", help="print info for debugging", action='store_true')
-    parser.add_argument("--overwrite_cache", help="set to True to re-create .far grammar files", action="store_true")
-    parser.add_argument(
-        "--cache_dir",
-        help="path to a dir with .far grammar file. Set to None to avoid using cache",
-        default=None,
-        type=str,
-    )
-    return parser.parse_args()
+    pass
 
 
 if __name__ == "__main__":

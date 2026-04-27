@@ -41,13 +41,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file):
-            whitelist = load_labels(file)
-            if input_case == "lower_cased":
-                whitelist = [[x[0].lower()] + x[1:] for x in whitelist]
-            else:
-                whitelist = [[x[0].lower()] + x[1:] for x in whitelist]
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist.tsv"))
 
@@ -55,7 +49,7 @@ class WhiteListFst(GraphFst):
             graph = _get_whitelist_graph(input_case, input_file)
 
         units_graph = _get_whitelist_graph(input_case, file=get_abs_path("data/measurements.tsv"))
-        # do not replace single letter units, like `м`, `°` and `%` will be replaced
+        # do not replace single letter units, like `Ð¼`, `Â°` and `%` will be replaced
         units_graph = pynini.compose((NEMO_CHAR ** (2, ...) | pynini.difference(NEMO_CHAR, RU_ALPHA)), units_graph)
         graph |= units_graph.optimize()
         graph |= TO_CYRILLIC + pynini.closure(pynutil.insert(" ") + TO_CYRILLIC)

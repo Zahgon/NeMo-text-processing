@@ -27,26 +27,26 @@ from pynini.lib import byte, pynutil, utf8
 NEMO_CHAR = utf8.VALID_UTF8_CHAR
 NEMO_DIGIT = byte.DIGIT
 
-NEMO_HI_DIGIT = pynini.union("०", "१", "२", "३", "४", "५", "६", "७", "८", "९").optimize()
-NEMO_HI_NON_ZERO = pynini.union("१", "२", "३", "४", "५", "६", "७", "८", "९").optimize()
-NEMO_HI_ZERO = "०"
+NEMO_HI_DIGIT = pynini.union("à¥¦", "à¥§", "à¥¨", "à¥©", "à¥ª", "à¥«", "à¥¬", "à¥­", "à¥®", "à¥¯").optimize()
+NEMO_HI_NON_ZERO = pynini.union("à¥§", "à¥¨", "à¥©", "à¥ª", "à¥«", "à¥¬", "à¥­", "à¥®", "à¥¯").optimize()
+NEMO_HI_ZERO = "à¥¦"
 # Combined Hindi and Arabic digits for graphs that need to accept both
 NEMO_ALL_DIGIT = pynini.union(NEMO_HI_DIGIT, NEMO_DIGIT).optimize()
-NEMO_ALL_ZERO = pynini.union("०", "0").optimize()
+NEMO_ALL_ZERO = pynini.union("à¥¦", "0").optimize()
 NEMO_ALL_NON_ZERO = pynini.union(NEMO_HI_NON_ZERO, "1", "2", "3", "4", "5", "6", "7", "8", "9").optimize()
 
-HI_DEDH = "डेढ़"  # 1.5
-HI_DHAI = "ढाई"  # 2.5
-HI_SAVVA = "सवा"  # quarter more (1.25)
-HI_SADHE = "साढ़े"  # half more (X.5)
-HI_PAUNE = "पौने"  # quarter less (0.75)
+HI_DEDH = "à¤¡à¥‡à¤¢à¤¼"  # 1.5
+HI_DHAI = "à¤¢à¤¾à¤ˆ"  # 2.5
+HI_SAVVA = "à¤¸à¤µà¤¾"  # quarter more (1.25)
+HI_SADHE = "à¤¸à¤¾à¤¢à¤¼à¥‡"  # half more (X.5)
+HI_PAUNE = "à¤ªà¥Œà¤¨à¥‡"  # quarter less (0.75)
 
 # Hindi decimal representations
-HI_POINT_FIVE = ".५"  # .5
-HI_ONE_POINT_FIVE = "१.५"  # 1.5
-HI_TWO_POINT_FIVE = "२.५"  # 2.5
-HI_DECIMAL_25 = ".२५"  # .25
-HI_DECIMAL_75 = ".७५"  # .75
+HI_POINT_FIVE = ".à¥«"  # .5
+HI_ONE_POINT_FIVE = "à¥§.à¥«"  # 1.5
+HI_TWO_POINT_FIVE = "à¥¨.à¥«"  # 2.5
+HI_DECIMAL_25 = ".à¥¨à¥«"  # .25
+HI_DECIMAL_75 = ".à¥­à¥«"  # .75
 
 # Arabic/English decimal representations
 EN_POINT_FIVE = ".5"
@@ -63,7 +63,7 @@ DECIMAL_25 = pynini.union(HI_DECIMAL_25, EN_DECIMAL_25).optimize()
 DECIMAL_75 = pynini.union(HI_DECIMAL_75, EN_DECIMAL_75).optimize()
 
 # Symbol constants
-HI_BY = "बाई"
+HI_BY = "à¤¬à¤¾à¤ˆ"
 LOWERCASE_X = "x"
 UPPERCASE_X = "X"
 ASTERISK = "*"
@@ -71,7 +71,7 @@ HYPHEN = "-"
 SLASH = "/"
 COMMA = ","
 PERIOD = "."
-HI_PERIOD = "।"
+HI_PERIOD = "à¥¤"
 
 NEMO_LOWER = pynini.union(*string.ascii_lowercase).optimize()
 NEMO_UPPER = pynini.union(*string.ascii_uppercase).optimize()
@@ -101,7 +101,7 @@ MIN_NEG_WEIGHT = -0.0001
 MIN_POS_WEIGHT = 0.0001
 INPUT_CASED = "cased"
 INPUT_LOWER_CASED = "lower_cased"
-MINUS = pynini.union(" ऋणात्मक ", " ऋणात्मक ").optimize()
+MINUS = pynini.union(" à¤‹à¤£à¤¾à¤¤à¥�à¤®à¤• ", " à¤‹à¤£à¤¾à¤¤à¥�à¤®à¤• ").optimize()
 
 
 def capitalized_input_graph(
@@ -115,16 +115,7 @@ def capitalized_input_graph(
         original_graph_weight: weight to add to the original `graph`
         capitalized_graph_weight: weight to add to the capitalized graph
     """
-    capitalized_graph = pynini.compose(TO_LOWER + NEMO_SIGMA, graph).optimize()
-
-    if original_graph_weight is not None:
-        graph = pynutil.add_weight(graph, weight=original_graph_weight)
-
-    if capitalized_graph_weight is not None:
-        capitalized_graph = pynutil.add_weight(capitalized_graph, weight=capitalized_graph_weight)
-
-    graph |= capitalized_graph
-    return graph
+    pass
 
 
 def generator_main(file_name: str, graphs: Dict[str, 'pynini.FstLike']):
@@ -135,11 +126,7 @@ def generator_main(file_name: str, graphs: Dict[str, 'pynini.FstLike']):
         file_name: exported file name
         graphs: Mapping of a rule name and Pynini WFST graph to be exported
     """
-    exporter = export.Exporter(file_name)
-    for rule, graph in graphs.items():
-        exporter[rule] = graph.optimize()
-    exporter.close()
-    logging.info(f'Created {file_name}')
+    pass
 
 
 def convert_space(fst) -> 'pynini.FstLike':
@@ -153,7 +140,7 @@ def convert_space(fst) -> 'pynini.FstLike':
 
     Returns output fst where breaking spaces are converted to non breaking spaces
     """
-    return fst @ pynini.cdrewrite(pynini.cross(NEMO_SPACE, NEMO_NON_BREAKING_SPACE), "", "", NEMO_SIGMA)
+    pass
 
 
 class GraphFst:
@@ -181,15 +168,15 @@ class GraphFst:
         """
         Returns true if FAR can be loaded
         """
-        return self.far_path.exists()
+        pass
 
     @property
     def fst(self) -> 'pynini.FstLike':
-        return self._fst
+        pass
 
     @fst.setter
     def fst(self, fst):
-        self._fst = fst
+        pass
 
     def add_tokens(self, fst) -> 'pynini.FstLike':
         """
@@ -201,7 +188,7 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        return pynutil.insert(f"{self.name} {{ ") + fst + pynutil.insert(" }")
+        pass
 
     def delete_tokens(self, fst) -> 'pynini.FstLike':
         """
@@ -213,13 +200,4 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        res = (
-            pynutil.delete(f"{self.name}")
-            + delete_space
-            + pynutil.delete("{")
-            + delete_space
-            + fst
-            + delete_space
-            + pynutil.delete("}")
-        )
-        return res @ pynini.cdrewrite(pynini.cross(u"\u00a0", " "), "", "", NEMO_SIGMA)
+        pass

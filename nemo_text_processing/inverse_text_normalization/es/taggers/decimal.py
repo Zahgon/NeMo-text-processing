@@ -43,38 +43,7 @@ def get_quantity(
         cardinal_up_to_million: cardinal FST
         input_case: accepting either "lower_cased" or "cased" input.
     """
-    numbers = cardinal_up_to_million @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix_labels = [
-        "millón",
-        "millones",
-        "millardo",
-        "millardos",
-        "billón",
-        "billones",
-        "trillón",
-        "trillones",
-        "cuatrillón",
-        "cuatrillones",
-    ]
-    suffix = pynini.union(*suffix_labels)
-
-    if input_case == INPUT_CASED:
-        suffix |= pynini.union(*[x[0].upper() + x[1:] for x in suffix_labels]).optimize()
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + suffix + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
@@ -88,7 +57,7 @@ class DecimalFst(GraphFst):
         (a cardinal) + ('coma' or 'punto') plus (any sequence of cardinals <1000, including 'zero')
 
         Also writes large numbers in shortened form, e.g.
-            e.g. uno coma dos seis millón -> decimal { negative: "false" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" quantity: "millón" }
+            e.g. uno coma dos seis millÃ³n -> decimal { negative: "false" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" quantity: "millÃ³n" }
             e.g. dos millones -> decimal { negative: "false" integer_part: "2" quantity: "millones" }
             e.g. mil ochocientos veinticuatro millones -> decimal { negative: "false" integer_part: "1824" quantity: "millones" }
     Args:

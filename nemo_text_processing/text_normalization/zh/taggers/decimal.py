@@ -21,49 +21,15 @@ from nemo_text_processing.text_normalization.zh.utils import get_abs_path
 
 
 def get_quantity(decimal):
-    suffix = pynini.union(
-        "万",
-        "十万",
-        "百万",
-        "千万",
-        "亿",
-        "十亿",
-        "百亿",
-        "千亿",
-        "萬",
-        "十萬",
-        "百萬",
-        "千萬",
-        "億",
-        "十億",
-        "百億",
-        "千億",
-        "拾萬",
-        "佰萬",
-        "仟萬",
-        "拾億",
-        "佰億",
-        "仟億",
-        "拾万",
-        "佰万",
-        "仟万",
-        "仟亿",
-        "佰亿",
-        "仟亿",
-        "万亿",
-        "萬億",
-    )
-    res = decimal + pynutil.insert(" quantity: \"") + suffix + pynutil.insert("\"")
-
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
-        0.5 -> decimal { integer_part: "零" fractional_part: "五" }
-        0.5万 -> decimal { integer_part: "零" fractional_part: "五" quantity: "万" }
-        -0.5万 -> decimal { negative: "负" integer_part: "零" fractional_part: "五" quantity: "万"}
+        0.5 -> decimal { integer_part: "é›¶" fractional_part: "äº”" }
+        0.5ä¸‡ -> decimal { integer_part: "é›¶" fractional_part: "äº”" quantity: "ä¸‡" }
+        -0.5ä¸‡ -> decimal { negative: "è´Ÿ" integer_part: "é›¶" fractional_part: "äº”" quantity: "ä¸‡"}
 
     Args:
         cardinal: CardinalFst
@@ -88,7 +54,7 @@ class DecimalFst(GraphFst):
 
         graph_sign = (
             (
-                pynini.closure(pynutil.insert("negative: \"") + pynini.cross("-", "负"))
+                pynini.closure(pynutil.insert("negative: \"") + pynini.cross("-", "è´Ÿ"))
                 + pynutil.insert("\"")
                 + pynutil.insert(" ")
             )
@@ -96,7 +62,7 @@ class DecimalFst(GraphFst):
             (
                 pynutil.insert('negative: ')
                 + pynutil.insert("\"")
-                + (pynini.accep('负') | pynini.cross('負', '负'))
+                + (pynini.accep('è´Ÿ') | pynini.cross('è² ', 'è´Ÿ'))
                 + pynutil.insert("\"")
                 + pynutil.insert(' ')
             )

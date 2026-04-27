@@ -22,46 +22,25 @@ from nemo_text_processing.text_normalization.en.graph_utils import NEMO_SPACE, G
 from nemo_text_processing.text_normalization.sv.utils import get_abs_path as get_tn_abs_path
 from nemo_text_processing.text_normalization.sv.utils import load_labels
 
-QUARTERS = {15: "kvart över", 30: "halv", 45: "kvart i"}
+QUARTERS = {15: "kvart Ã¶ver", 30: "halv", 45: "kvart i"}
 
 
 def get_all_to_or_from_numbers():
-    output = {}
-    for num, word in QUARTERS.items():
-        current_past = []
-        current_to = []
-        for i in range(1, 60):
-            if i == num:
-                continue
-            elif i < num:
-                current_to.append((str(i), str(num - i)))
-            else:
-                current_past.append((str(i), str(i - num)))
-        output[word] = {}
-        output[word]["över"] = current_past
-        output[word]["i"] = current_to
-    return output
+    pass
 
 
 def get_all_to_or_from_fst(cardinal: GraphFst):
-    numbers = get_all_to_or_from_numbers()
-    output = {}
-    for key in numbers:
-        output[key] = {}
-        for when in ["över", "i"]:
-            map = pynini.string_map(numbers[key][when])
-            output[key][when] = pynini.project(map, "input") @ map @ cardinal.graph
-    return output
+    pass
 
 
 class TimeFst(GraphFst):
     """
     Finite state transducer for classifying time
-        e.g. klockan åtta e s t -> time { hours: "kl. 8" zone: "e s t" }
+        e.g. klockan Ã¥tta e s t -> time { hours: "kl. 8" zone: "e s t" }
         e.g. klockan tretton -> time { hours: "kl. 13" }
         e.g. klockan tretton tio -> time { hours: "kl. 13" minutes: "10" }
         e.g. kvart i tolv -> time { minutes: "45" hours: "11" }
-        e.g. kvart över tolv -> time { minutes: "15" hours: "12" }
+        e.g. kvart Ã¶ver tolv -> time { minutes: "15" hours: "12" }
 
     Args:
         tn_cardinal_tagger: TN cardinal verbalizer
@@ -73,7 +52,7 @@ class TimeFst(GraphFst):
         suffixes = pynini.invert(pynini.string_map(load_labels(get_abs_path("data/time/suffix.tsv"))))
         self.suffixes = suffixes
 
-        klockan = pynini.union(pynini.cross("klockan", "kl."), pynini.cross("klockan är", "kl."))
+        klockan = pynini.union(pynini.cross("klockan", "kl."), pynini.cross("klockan Ã¤r", "kl."))
         klockan_graph_piece = pynutil.insert("hours: \"") + klockan
         minutes_to = pynini.string_map([(str(i), str(60 - i)) for i in range(1, 60)])
         minutes = pynini.string_map([str(i) for i in range(1, 60)])
@@ -103,20 +82,15 @@ class TimeFst(GraphFst):
         hour_sfx = hours_graph + one_optional_suffix
 
         def hours_to_pairs():
-            for x in range(1, 13):
-                if x == 12:
-                    y = 1
-                else:
-                    y = x + 1
-                yield x, y
+            pass
 
         hours_to = pynini.string_map([(str(x[0]), str(x[1])) for x in hours_to_pairs()])
         hours_to = pynini.invert(hours_to @ tn_cardinal_tagger.graph)
         self.hours_to = hours_to
         hours_to_graph = pynutil.insert("hours: \"") + hours_to + pynutil.insert("\"")
 
-        bare_quarters_to = pynini.string_map([(x[1], str(x[0])) for x in QUARTERS.items() if not "över" in x[1]])
-        bare_quarters_from = pynini.cross("kvart över", "15")
+        bare_quarters_to = pynini.string_map([(x[1], str(x[0])) for x in QUARTERS.items() if not "Ã¶ver" in x[1]])
+        bare_quarters_from = pynini.cross("kvart Ã¶ver", "15")
         self.quarters_to = bare_quarters_to
         self.quarters_from = bare_quarters_from
         prefix_minutes_to = bare_quarters_to
@@ -125,15 +99,15 @@ class TimeFst(GraphFst):
         from_to_output = get_all_to_or_from_fst(tn_cardinal_tagger)
 
         for _, word in QUARTERS.items():
-            for when in ["över", "i"]:
+            for when in ["Ã¶ver", "i"]:
                 num_part = pynini.invert(from_to_output[word][when])
                 num_part_end = num_part + pynutil.delete(f" {when} {word}")
-                if word == "kvart över":
+                if word == "kvart Ã¶ver":
                     prefix_minutes_from |= num_part_end
                 else:
                     prefix_minutes_to |= num_part_end
         prefix_minutes_to |= minutes_inverse + pynutil.delete(" i")
-        prefix_minutes_from |= minutes + pynutil.delete(" över")
+        prefix_minutes_from |= minutes + pynutil.delete(" Ã¶ver")
         prefix_minutes_to_graph = pynutil.insert("minutes: \"") + prefix_minutes_to + pynutil.insert("\"")
         graph_to_prefixed = prefix_minutes_to_graph + NEMO_SPACE + hours_to_graph
         prefix_minutes_from_graph = pynutil.insert("minutes: \"") + prefix_minutes_from + pynutil.insert("\"")

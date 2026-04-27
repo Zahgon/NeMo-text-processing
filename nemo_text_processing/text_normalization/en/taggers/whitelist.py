@@ -55,17 +55,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file, keep_punct_add_end: bool = False):
-            whitelist = load_labels(file)
-            if input_case == INPUT_LOWER_CASED:
-                whitelist = [[x.lower(), y] for x, y in whitelist]
-            else:
-                whitelist = [[x, y] for x, y in whitelist]
-
-            if keep_punct_add_end:
-                whitelist.extend(augment_labels_with_punct_at_end(whitelist))
-
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist/tts.tsv"))
         graph |= pynini.compose(
@@ -136,18 +126,4 @@ def get_formats(input_f, input_case=INPUT_CASED, is_default=True):
     """
     Adds various abbreviation format options to the list of acceptable input forms
     """
-    multiple_formats = load_labels(input_f)
-    additional_options = []
-    for x, y in multiple_formats:
-        if input_case == INPUT_LOWER_CASED:
-            x = x.lower()
-        additional_options.append((f"{x}.", y))  # default "dr" -> doctor, this includes period "dr." -> doctor
-        additional_options.append((f"{x[0].upper() + x[1:]}", f"{y[0].upper() + y[1:]}"))  # "Dr" -> Doctor
-        additional_options.append((f"{x[0].upper() + x[1:]}.", f"{y[0].upper() + y[1:]}"))  # "Dr." -> Doctor
-    multiple_formats.extend(additional_options)
-
-    if not is_default:
-        multiple_formats = [(x, f"|raw_start|{x}|raw_end||norm_start|{y}|norm_end|") for (x, y) in multiple_formats]
-
-    multiple_formats = pynini.string_map(multiple_formats)
-    return multiple_formats
+    pass

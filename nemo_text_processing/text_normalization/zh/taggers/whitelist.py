@@ -37,9 +37,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(file):
-            whitelist = load_labels(file)
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(get_abs_path("data/whitelist.tsv"))
 

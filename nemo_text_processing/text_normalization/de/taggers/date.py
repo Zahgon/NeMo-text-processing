@@ -41,25 +41,7 @@ def get_year_graph(cardinal: GraphFst) -> 'pynini.FstLike':
         delete_leading_zero: removed leading zero
         cardinal: cardinal GraphFst
     """
-
-    year_gt_2000 = (pynini.union("21", "20") + NEMO_DIGIT**2) @ cardinal.graph
-
-    graph_two_digit = delete_leading_zero @ cardinal.two_digit_non_zero
-    hundred = pynutil.insert("hundert")
-    graph_double_double = (
-        (pynini.accep("1") + NEMO_DIGIT) @ graph_two_digit
-        + insert_space
-        + pynini.closure(hundred + insert_space, 0, 1)
-        + graph_two_digit
-    )
-    # for 20**
-    graph_double_double |= pynini.accep("20") @ graph_two_digit + insert_space + graph_two_digit
-    graph = (
-        graph_double_double
-        | (pynini.accep("1") + NEMO_DIGIT) @ graph_two_digit + insert_space + pynutil.delete("00") + hundred
-        | year_gt_2000
-    )
-    return graph
+    pass
 
 
 class DateFst(GraphFst):

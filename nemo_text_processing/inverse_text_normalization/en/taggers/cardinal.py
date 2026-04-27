@@ -247,9 +247,4 @@ class CardinalFst(GraphFst):
 
     def delete_word(self, word: str):
         """Capitalizes word for `cased` input"""
-        delete_graph = pynutil.delete(word).optimize()
-        if self.input_case == INPUT_CASED:
-            if len(word) > 0:
-                delete_graph |= pynutil.delete(word[0].upper() + word[1:])
-
-        return delete_graph.optimize()
+        pass

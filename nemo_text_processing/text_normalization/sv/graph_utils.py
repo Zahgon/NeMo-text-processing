@@ -1,6 +1,6 @@
 # Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
 # Copyright 2015 and onwards Google, Inc.
-# Copyright (c) 2023, Jim O'Regan for Språkbanken Tal
+# Copyright (c) 2023, Jim O'Regan for SprÃ¥kbanken Tal
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ from nemo_text_processing.text_normalization.en.graph_utils import delete_space,
 
 from .utils import get_abs_path, load_labels
 
-_ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖÜÉ"
-_ALPHA_LOWER = "abcdefghijklmnopqrstuvwxyzåäöüé"
+_ALPHA_UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZÃ…Ã„Ã–ÃœÃ‰"
+_ALPHA_LOWER = "abcdefghijklmnopqrstuvwxyzÃ¥Ã¤Ã¶Ã¼Ã©"
 
 TO_LOWER = pynini.union(*[pynini.cross(x, y) for x, y in zip(_ALPHA_UPPER, _ALPHA_LOWER)])
 TO_UPPER = pynini.invert(TO_LOWER)
@@ -47,24 +47,4 @@ def roman_to_int(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Args:
         fst: Any fst. Composes fst onto Roman conversion outputs.
     """
-
-    def _load_roman(file: str):
-        roman = load_labels(get_abs_path(file))
-        roman_numerals = [(x, y) for x, y in roman] + [(x.upper(), y) for x, y in roman]
-        return pynini.string_map(roman_numerals)
-
-    digit = _load_roman("data/roman/digit.tsv")
-    ties = _load_roman("data/roman/ties.tsv")
-    hundreds = _load_roman("data/roman/hundreds.tsv")
-
-    graph = (
-        digit
-        | ties + (digit | pynutil.add_weight(pynutil.insert("0"), 0.01))
-        | (
-            hundreds
-            + (ties | pynutil.add_weight(pynutil.insert("0"), 0.01))
-            + (digit | pynutil.add_weight(pynutil.insert("0"), 0.01))
-        )
-    ).optimize()
-
-    return graph @ fst
+    pass

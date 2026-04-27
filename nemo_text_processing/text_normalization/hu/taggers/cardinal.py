@@ -29,24 +29,7 @@ from nemo_text_processing.text_normalization.hu.utils import get_abs_path
 
 
 def make_million(word: str, hundreds: 'pynini.FstLike', deterministic=False):
-    insert_hyphen = pynutil.insert("-")
-    # in the non-deterministic case, add an optional space
-    if not deterministic:
-        insert_hyphen |= pynini.closure(pynutil.insert(" "), 0, 1)
-
-    graph_million = pynutil.add_weight(pynini.cross("001", word), -0.001)
-    graph_million |= hundreds + pynutil.insert(word)
-    if not deterministic:
-        graph_million |= pynutil.add_weight(pynini.cross("001", "egy{word}"), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", "egy{word} "), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", "{word} "), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", " egy{word}"), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", " egy{word} "), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", " egy {word} "), -0.001)
-        graph_million |= pynutil.add_weight(pynini.cross("001", " {word} "), -0.001)
-    graph_million += insert_hyphen
-    graph_million |= pynutil.delete("000")
-    return graph_million
+    pass
 
 
 def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
@@ -61,31 +44,15 @@ def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Returns:
         fst: A pynini.FstLike object
     """
-    cardinal_separator = pynini.string_map([".", NEMO_SPACE])
-    exactly_three_digits = NEMO_DIGIT**3  # for blocks of three
-    up_to_three_digits = pynini.closure(NEMO_DIGIT, 1, 3)  # for start of string
-    up_to_three_digits = up_to_three_digits - "000" - "00" - "0"
-
-    cardinal_string = pynini.closure(
-        NEMO_DIGIT, 1
-    )  # For string w/o punctuation (used for page numbers, thousand series)
-
-    cardinal_string |= (
-        up_to_three_digits
-        + pynutil.delete(cardinal_separator)
-        + pynini.closure(exactly_three_digits + pynutil.delete(cardinal_separator))
-        + exactly_three_digits
-    )
-
-    return cardinal_string @ fst
+    pass
 
 
 class CardinalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals, e.g.
         "1000" ->  cardinal { integer: "ezer" }
-        "9999" -> cardinal { integer: "kilencezer-kilencszázkilencvenkilenc" }
-        "2000000" -> cardinal { integer: "kétmillió" }
+        "9999" -> cardinal { integer: "kilencezer-kilencszÃ¡zkilencvenkilenc" }
+        "2000000" -> cardinal { integer: "kÃ©tmilliÃ³" }
 
     Args:
         deterministic: if True will provide a single transduction option,
@@ -111,8 +78,8 @@ class CardinalFst(GraphFst):
         digits_inline_no_one = (NEMO_DIGIT - "1") @ digit_inline
         digits_no_one = (NEMO_DIGIT - "1") @ digit
         if not deterministic:
-            graph_digit |= pynini.cross("2", "két")
-            digits_inline_no_one |= pynini.cross("2", "kettő")
+            graph_digit |= pynini.cross("2", "kÃ©t")
+            digits_inline_no_one |= pynini.cross("2", "kettÅ‘")
 
         insert_hyphen = pynutil.insert("-")
         # in the non-deterministic case, add an optional space
@@ -126,33 +93,33 @@ class CardinalFst(GraphFst):
 
         self.two_digit_non_zero = pynini.union(graph_digit, graph_tens, (pynutil.delete("0") + digit)).optimize()
 
-        base_hundreds = pynini.union(pynini.cross("1", "száz"), digits_inline_no_one + pynutil.insert("száz"))
+        base_hundreds = pynini.union(pynini.cross("1", "szÃ¡z"), digits_inline_no_one + pynutil.insert("szÃ¡z"))
         if not deterministic:
-            base_hundreds |= pynini.cross("1", "egyszáz")
-            base_hundreds |= pynini.cross("1", " egyszáz")
-            base_hundreds |= pynini.cross("1", "egy száz")
-            base_hundreds |= pynini.cross("1", " egy száz")
-            base_hundreds |= pynini.cross("1", " száz")
-            digits_inline_no_one |= pynutil.insert(" száz")
+            base_hundreds |= pynini.cross("1", "egyszÃ¡z")
+            base_hundreds |= pynini.cross("1", " egyszÃ¡z")
+            base_hundreds |= pynini.cross("1", "egy szÃ¡z")
+            base_hundreds |= pynini.cross("1", " egy szÃ¡z")
+            base_hundreds |= pynini.cross("1", " szÃ¡z")
+            digits_inline_no_one |= pynutil.insert(" szÃ¡z")
 
         hundreds = pynini.union(
-            pynini.cross("100", "száz"),
-            pynini.cross("1", "száz") + graph_tens,
-            digits_inline_no_one + pynini.cross("00", "száz"),
-            digits_inline_no_one + pynutil.insert("száz") + graph_tens,
+            pynini.cross("100", "szÃ¡z"),
+            pynini.cross("1", "szÃ¡z") + graph_tens,
+            digits_inline_no_one + pynini.cross("00", "szÃ¡z"),
+            digits_inline_no_one + pynutil.insert("szÃ¡z") + graph_tens,
         )
         if not deterministic:
             hundreds |= pynini.union(
-                pynini.cross("100", "egyszáz"),
-                pynini.cross("1", "egyszáz") + graph_tens,
-                pynini.cross("100", " egyszáz"),
-                pynini.cross("1", " egyszáz ") + graph_tens,
-                pynini.cross("100", "egy száz"),
-                pynini.cross("1", "egy száz") + graph_tens,
-                pynini.cross("100", " egy száz"),
-                pynini.cross("1", " egy száz ") + graph_tens,
-                pynini.cross("100", " száz"),
-                pynini.cross("1", " száz ") + graph_tens,
+                pynini.cross("100", "egyszÃ¡z"),
+                pynini.cross("1", "egyszÃ¡z") + graph_tens,
+                pynini.cross("100", " egyszÃ¡z"),
+                pynini.cross("1", " egyszÃ¡z ") + graph_tens,
+                pynini.cross("100", "egy szÃ¡z"),
+                pynini.cross("1", "egy szÃ¡z") + graph_tens,
+                pynini.cross("100", " egy szÃ¡z"),
+                pynini.cross("1", " egy szÃ¡z ") + graph_tens,
+                pynini.cross("100", " szÃ¡z"),
+                pynini.cross("1", " szÃ¡z ") + graph_tens,
             )
 
         # Three digit strings
@@ -217,12 +184,12 @@ class CardinalFst(GraphFst):
             graph_thousands_component_at_least_one_non_zero_digit_no_one
         )
 
-        graph_million = make_million("millió", self.hundreds_non_zero_no_one, deterministic)
-        graph_milliard = make_million("milliárd", self.hundreds_non_zero_no_one, deterministic)
-        graph_billion = make_million("billió", self.hundreds_non_zero_no_one, deterministic)
-        graph_billiard = make_million("billiárd", self.hundreds_non_zero_no_one, deterministic)
-        graph_trillion = make_million("trillió", self.hundreds_non_zero_no_one, deterministic)
-        graph_trilliard = make_million("trilliárd", self.hundreds_non_zero_no_one, deterministic)
+        graph_million = make_million("milliÃ³", self.hundreds_non_zero_no_one, deterministic)
+        graph_milliard = make_million("milliÃ¡rd", self.hundreds_non_zero_no_one, deterministic)
+        graph_billion = make_million("billiÃ³", self.hundreds_non_zero_no_one, deterministic)
+        graph_billiard = make_million("billiÃ¡rd", self.hundreds_non_zero_no_one, deterministic)
+        graph_trillion = make_million("trilliÃ³", self.hundreds_non_zero_no_one, deterministic)
+        graph_trilliard = make_million("trilliÃ¡rd", self.hundreds_non_zero_no_one, deterministic)
 
         graph = (
             graph_trilliard

@@ -59,38 +59,4 @@ class PostProcessingFst:
 
         By default, spaces are removed before punctuation marks like comma, period, etc.
         """
-        punct_marks_all = PunctuationFst().punct_marks
-
-        # Punctuation marks that should NOT have space before them
-        # (most punctuation except quotes, dashes, and opening brackets)
-        quotes = ["'", "\"", "«"]
-        dashes = ["-", "—"]
-        brackets = ["<", "{", "(", r"\["]
-        allow_space_before_punct = quotes + dashes + brackets
-
-        no_space_before_punct = [m for m in punct_marks_all if m not in allow_space_before_punct]
-        # Add Hindi-specific punctuation
-        no_space_before_punct.extend(["।", ",", ".", ";", ":", "!", "?"])
-        # Remove duplicates
-        no_space_before_punct = list(set(no_space_before_punct))
-        no_space_before_punct = pynini.union(*no_space_before_punct)
-
-        delete_space = pynutil.delete(" ")
-
-        # Delete space before no_space_before_punct marks
-        non_punct = pynini.difference(NEMO_CHAR, no_space_before_punct).optimize()
-        graph = (
-            pynini.closure(non_punct)
-            + pynini.closure(
-                no_space_before_punct | pynutil.add_weight(delete_space + no_space_before_punct, MIN_NEG_WEIGHT)
-            )
-            + pynini.closure(non_punct)
-        )
-        graph = pynini.closure(graph).optimize()
-
-        # Remove space after opening brackets
-        no_space_after_punct = pynini.union(*brackets)
-        no_space_after_punct = pynini.cdrewrite(delete_space, no_space_after_punct, NEMO_SIGMA, NEMO_SIGMA).optimize()
-        graph = pynini.compose(graph, no_space_after_punct).optimize()
-
-        return graph
+        pass

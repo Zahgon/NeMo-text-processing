@@ -31,19 +31,7 @@ def get_quantity(decimal: 'pynini.FstLike', cardinal_up_to_hundred: 'pynini.FstL
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    numbers = cardinal_up_to_hundred
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + pynini.accep(" ")
-        + pynutil.insert("quantity: \"")
-        + quantities
-        + pynutil.insert("\"")
-    )
-    res |= decimal + pynini.accep(" ") + pynutil.insert("quantity: \"") + quantities + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

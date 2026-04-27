@@ -22,7 +22,7 @@ from nemo_text_processing.text_normalization.hy.utils import get_abs_path
 class WhiteListFst(GraphFst):
     """
     Finite state transducer for classifying whitelist, e.g.
-        մ.թ.ա. -> tokens { name: "մեր թվարկությունից առաջ" }
+        Õ´.Õ©.Õ¡. -> tokens { name: "Õ´Õ¥Ö€ Õ©Õ¾Õ¡Ö€Õ¯Õ¸Ö‚Õ©ÕµÕ¸Ö‚Õ¶Õ«Ö� Õ¡Õ¼Õ¡Õ»" }
     This class has highest priority among all classifier grammars. Whitelisted tokens are defined and loaded from "data/whitelist.tsv".
 
     Args:
@@ -33,11 +33,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify")
 
         def _get_whitelist_graph(file):
-            whitelist = load_labels(file)
-            whitelist = [[x, y] for x, y in whitelist]
-
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         whitelist = pynini.string_file(get_abs_path("data/whitelist.tsv"))
         if input_file:

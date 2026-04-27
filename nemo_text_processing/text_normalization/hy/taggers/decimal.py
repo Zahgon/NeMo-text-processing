@@ -28,34 +28,19 @@ from nemo_text_processing.text_normalization.hy.utils import get_abs_path
 def get_quantity(decimal_graph: "pynini.FstLike", cardinal_graph: "pynini.FstLike") -> "pynini.FstLike":
     """
     Returns FST that transforms either a cardinal or decimal followed by a quantity into a numeral,
-    e.g. 2 միլիոն -> integer_part: "երկու" quantity: "միլիոն"
-    e.g. 2․4 միլիոն -> integer_part: "երկու" fractional_part: "չորս" quantity: "միլիոն"
+    e.g. 2 Õ´Õ«Õ¬Õ«Õ¸Õ¶ -> integer_part: "Õ¥Ö€Õ¯Õ¸Ö‚" quantity: "Õ´Õ«Õ¬Õ«Õ¸Õ¶"
+    e.g. 2â€¤4 Õ´Õ«Õ¬Õ«Õ¸Õ¶ -> integer_part: "Õ¥Ö€Õ¯Õ¸Ö‚" fractional_part: "Õ¹Õ¸Ö€Õ½" quantity: "Õ´Õ«Õ¬Õ«Õ¸Õ¶"
     Args:
         decimal_graph: DecimalFST
         cardinal_graph: CardinalFST
     """
-    quantities = pynini.string_file(get_abs_path("data/numbers/quantities.tsv"))
-    delete_separator = pynini.closure(pynutil.delete(NEMO_SPACE), 0, 1)
-    numbers = pynini.closure(NEMO_DIGIT, 1, 6) @ cardinal_graph
-    numbers = pynini.cdrewrite(pynutil.delete(delete_separator), "", "", NEMO_SIGMA) @ numbers
-
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers
-        + pynutil.insert('"')
-        + NEMO_SPACE
-        + pynutil.insert('quantity: "')
-        + quantities
-        + pynutil.insert('"')
-    )
-    res |= decimal_graph + NEMO_SPACE + pynutil.insert('quantity: "') + quantities + pynutil.insert('"')
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
-        554 միլիարդ -> decimal { integer_part: "հինգ հարյուր հիսունչորս" quantity: "միլիարդ" }
+        554 Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤ -> decimal { integer_part: "Õ°Õ«Õ¶Õ£ Õ°Õ¡Ö€ÕµÕ¸Ö‚Ö€ Õ°Õ«Õ½Õ¸Ö‚Õ¶Õ¹Õ¸Ö€Õ½" quantity: "Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤" }
     Args:
         cardinal: CardinalFst
         deterministic is not necessary right now
@@ -69,7 +54,7 @@ class DecimalFst(GraphFst):
 
         graph = graph.optimize()
 
-        delete_separator = pynutil.delete(".") | pynutil.delete("․")
+        delete_separator = pynutil.delete(".") | pynutil.delete("â€¤")
         optional_graph_negative = pynini.closure(pynutil.insert("negative: ") + pynini.cross("-", '"true" '), 0, 1)
 
         graph_fractional = pynutil.insert('fractional_part: "') + graph + pynutil.insert('"')

@@ -1,5 +1,5 @@
 # Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
-# Copyright (c) 2022, 2023 Jim O'Regan for Språkbanken Tal
+# Copyright (c) 2022, 2023 Jim O'Regan for SprÃ¥kbanken Tal
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,23 +39,7 @@ def make_million(number: str, non_zero_no_one: 'pynini.FstLike', deterministic: 
     Returns:
         graph: A pynini.FstLike object
     """
-    old_orth = number.replace("lj", "lli")
-    graph = pynutil.add_weight(pynini.cross("001", number), -0.001)
-    if not deterministic:
-        graph |= pynutil.add_weight(pynini.cross("001", old_orth), -0.001)
-        # 'ett' is usually wrong for these numbers, but it occurs
-        for one in ["en", "ett"]:
-            graph |= pynutil.add_weight(pynini.cross("001", f"{one} {number}"), -0.001)
-            graph |= pynutil.add_weight(pynini.cross("001", f"{one} {old_orth}"), -0.001)
-            graph |= pynutil.add_weight(pynini.cross("001", f"{one}{number}"), -0.001)
-            graph |= pynutil.add_weight(pynini.cross("001", f"{one}{old_orth}"), -0.001)
-    graph |= non_zero_no_one + pynutil.insert(f" {number}er")
-    if not deterministic:
-        graph |= pynutil.add_weight(non_zero_no_one + pynutil.insert(f" {old_orth}er"), -0.001)
-        graph |= pynutil.add_weight(non_zero_no_one + pynutil.insert(f"{old_orth}er"), -0.001)
-    graph |= pynutil.delete("000")
-    graph += insert_space
-    return graph
+    pass
 
 
 def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
@@ -69,29 +53,14 @@ def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Returns:
         fst: A pynini.FstLike object
     """
-    exactly_three_digits = NEMO_DIGIT**3  # for blocks of three
-    up_to_three_digits = pynini.closure(NEMO_DIGIT, 1, 3)  # for start of string
-
-    cardinal_separator = NEMO_SPACE
-    cardinal_string = pynini.closure(
-        NEMO_DIGIT, 1
-    )  # For string w/o punctuation (used for page numbers, thousand series)
-
-    cardinal_string |= (
-        up_to_three_digits
-        + pynutil.delete(cardinal_separator)
-        + pynini.closure(exactly_three_digits + pynutil.delete(cardinal_separator))
-        + exactly_three_digits
-    )
-
-    return cardinal_string @ fst
+    pass
 
 
 class CardinalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals, e.g.
         "1000" ->  cardinal { integer: "tusen" }
-        "2 000 000" -> cardinal { integer: "två miljon" }
+        "2 000 000" -> cardinal { integer: "tvÃ¥ miljon" }
 
     Args:
         deterministic: if True will provide a single transduction option,
@@ -124,8 +93,8 @@ class CardinalFst(GraphFst):
         alt_ties = ties @ pynini.cdrewrite(ties_alt_endings, "", "[EOS]", NEMO_SIGMA)
         if not deterministic:
             ties |= pynutil.add_weight(alt_ties, -0.001)
-            ties |= pynutil.add_weight(pynini.cross("4", "förtio"), -0.001)
-            ties |= pynutil.add_weight(pynini.cross("4", "förti"), -0.001)
+            ties |= pynutil.add_weight(pynini.cross("4", "fÃ¶rtio"), -0.001)
+            ties |= pynutil.add_weight(pynini.cross("4", "fÃ¶rti"), -0.001)
             ties |= pynutil.add_weight(pynini.cross("2", "tju"), -0.001)
 
         # Any double digit
@@ -350,7 +319,7 @@ class CardinalFst(GraphFst):
         self.graph_no_one = (pynini.project(self.graph, "input") - "1") @ self.graph
         self.graph_no_one_en = (pynini.project(self.graph_en, "input") - "1") @ self.graph_en
 
-        joiner_chars = pynini.union("-", "–", "—")
+        joiner_chars = pynini.union("-", "â€“", "â€”")
         joiner = pynini.cross(joiner_chars, " till ")
         self.range = self.graph + joiner + self.graph
         if not deterministic:

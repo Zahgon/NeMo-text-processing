@@ -39,29 +39,7 @@ def get_ties_digit(digit_path: str, tie_path: str) -> 'pynini.FstLike':
     Returns:
         res: fst that converts numbers to their verbalization
     """
-
-    digits = defaultdict(list)
-    ties = defaultdict(list)
-    for k, v in load_labels(digit_path):
-        digits[v].append(k)
-    digits["1"] = ["ein"]
-
-    for k, v in load_labels(tie_path):
-        ties[v].append(k)
-
-    d = []
-    for i in range(21, 100):
-        s = str(i)
-        if s[1] == "0":
-            continue
-
-        for di in digits[s[1]]:
-            for ti in ties[s[0]]:
-                word = di + f" {AND} " + ti
-                d.append((word, s))
-
-    res = pynini.string_map(d)
-    return res
+    pass
 
 
 class CardinalFst(GraphFst):
@@ -88,25 +66,13 @@ class CardinalFst(GraphFst):
         # separator = "."
 
         def tens_no_zero():
-            return (
-                pynutil.delete("0") + graph_digit
-                | get_ties_digit(
-                    get_abs_path("data/numbers/digit.tsv"), get_abs_path("data/numbers/ties.tsv")
-                ).invert()
-                | graph_teen
-                | (graph_ties + pynutil.delete("0"))
-            )
+            pass
 
         def hundred_non_zero():
-            return (graph_digit_no_one + insert_space | pynini.cross("1", "ein ")) + pynutil.insert("hundert") + (
-                pynini.closure(insert_space + pynutil.insert(AND, weight=0.0001), 0, 1) + insert_space + tens_no_zero()
-                | pynutil.delete("00")
-            ) | pynutil.delete("0") + tens_no_zero()
+            pass
 
         def thousand():
-            return (hundred_non_zero() + insert_space + pynutil.insert("tausend") | pynutil.delete("000")) + (
-                insert_space + hundred_non_zero() | pynutil.delete("000")
-            )
+            pass
 
         optional_plural_quantity_en = pynini.closure(pynutil.insert("en", weight=-0.0001), 0, 1)
         optional_plural_quantity_n = pynini.closure(pynutil.insert("n", weight=-0.0001), 0, 1)

@@ -37,20 +37,7 @@ zero = pynini.invert(pynini.string_file(get_abs_path("data/numbers/zero.tsv")))
 
 def get_quantity(decimal_graph: "pynini.FstLike", cardinal_graph: "pynini.FstLike") -> "pynini.FstLike":
     """ """
-    numbers = pynini.closure(NEMO_DIGIT, 1, 6) @ cardinal_graph
-    numbers = pynini.cdrewrite(pynutil.delete(cardinal_separator), "", "", NEMO_SIGMA) @ numbers
-
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers
-        + pynutil.insert('"')
-        + NEMO_SPACE
-        + pynutil.insert('quantity: "')
-        + quantities
-        + pynutil.insert('"')
-    )
-    res |= decimal_graph + NEMO_SPACE + pynutil.insert('quantity: "') + quantities + pynutil.insert('"')
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

@@ -22,11 +22,11 @@ from nemo_text_processing.text_normalization.vi.utils import get_abs_path, load_
 class RomanFst(GraphFst):
     """
     Finite state transducer for classifying roman numbers in Vietnamese context:
-        e.g. "thế kỉ XV" -> tokens { roman { key_cardinal: "thế kỉ" integer: "mười lăm" } }
-        e.g. "thế kỷ IV" -> tokens { roman { key_cardinal: "thế kỷ" integer: "bốn" } }
-        e.g. "thứ IV" -> tokens { roman { key_cardinal: "thứ" integer: "bốn" } }
-        e.g. "chương III" -> tokens { roman { key_cardinal: "chương" integer: "ba" } }
-        e.g. "phần ix" -> tokens { roman { key_cardinal: "phần" integer: "chín" } }
+        e.g. "tháº¿ ká»‰ XV" -> tokens { roman { key_cardinal: "tháº¿ ká»‰" integer: "mÆ°á»�i lÄƒm" } }
+        e.g. "tháº¿ ká»· IV" -> tokens { roman { key_cardinal: "tháº¿ ká»·" integer: "bá»‘n" } }
+        e.g. "thá»© IV" -> tokens { roman { key_cardinal: "thá»©" integer: "bá»‘n" } }
+        e.g. "chÆ°Æ¡ng III" -> tokens { roman { key_cardinal: "chÆ°Æ¡ng" integer: "ba" } }
+        e.g. "pháº§n ix" -> tokens { roman { key_cardinal: "pháº§n" integer: "chÃ­n" } }
 
     Args:
         cardinal: CardinalFst
@@ -80,12 +80,4 @@ class RomanFst(GraphFst):
         self.fst = self.add_tokens(graph).optimize()
 
     def _int_to_roman(self, num):
-        values = sorted(self.arabic_to_roman.keys(), reverse=True)
-
-        roman_num = ''
-        for value in values:
-            while num >= value:
-                roman_num += self.arabic_to_roman[value]
-                num -= value
-
-        return roman_num
+        pass

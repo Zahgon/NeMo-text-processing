@@ -48,21 +48,7 @@ def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Returns:
         fst: A pynini.FstLike object
     """
-    exactly_three_digits = NEMO_DIGIT**3  # for blocks of three
-    up_to_three_digits = pynini.closure(NEMO_DIGIT, 1, 3)  # for start of string
-
-    cardinal_string = pynini.closure(
-        NEMO_DIGIT, 1
-    )  # For string w/o punctuation (used for page numbers, thousand series)
-
-    cardinal_string |= (
-        up_to_three_digits
-        + pynutil.delete(cardinal_separator)
-        + pynini.closure(exactly_three_digits + pynutil.delete(cardinal_separator))
-        + exactly_three_digits
-    )
-
-    return cardinal_string @ fst
+    pass
 
 
 class CardinalFst(GraphFst):

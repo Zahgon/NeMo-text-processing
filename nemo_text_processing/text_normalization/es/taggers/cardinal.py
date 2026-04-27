@@ -47,21 +47,7 @@ def filter_punctuation(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Returns:
         fst: A pynini.FstLike object
     """
-    exactly_three_digits = NEMO_DIGIT**3  # for blocks of three
-    up_to_three_digits = pynini.closure(NEMO_DIGIT, 1, 3)  # for start of string
-
-    cardinal_string = pynini.closure(
-        NEMO_DIGIT, 1
-    )  # For string w/o punctuation (used for page numbers, thousand series)
-
-    cardinal_string |= (
-        up_to_three_digits
-        + pynutil.delete(cardinal_separator)
-        + pynini.closure(exactly_three_digits + pynutil.delete(cardinal_separator))
-        + exactly_three_digits
-    )
-
-    return cardinal_string @ fst
+    pass
 
 
 class CardinalFst(GraphFst):
@@ -132,17 +118,17 @@ class CardinalFst(GraphFst):
             + ((insert_space + graph_hundreds_component_at_least_one_none_zero_digit) | pynutil.delete("000")),
         )
 
-        graph_million = pynutil.add_weight(pynini.cross("000001", "un millón"), -0.001)
+        graph_million = pynutil.add_weight(pynini.cross("000001", "un millÃ³n"), -0.001)
         graph_million |= graph_thousands_component_at_least_one_none_zero_digit_no_one + pynutil.insert(" millones")
         graph_million |= pynutil.delete("000000")
         graph_million += insert_space
 
-        graph_billion = pynutil.add_weight(pynini.cross("000001", "un billón"), -0.001)
+        graph_billion = pynutil.add_weight(pynini.cross("000001", "un billÃ³n"), -0.001)
         graph_billion |= graph_thousands_component_at_least_one_none_zero_digit_no_one + pynutil.insert(" billones")
         graph_billion |= pynutil.delete("000000")
         graph_billion += insert_space
 
-        graph_trillion = pynutil.add_weight(pynini.cross("000001", "un trillón"), -0.001)
+        graph_trillion = pynutil.add_weight(pynini.cross("000001", "un trillÃ³n"), -0.001)
         graph_trillion |= graph_thousands_component_at_least_one_none_zero_digit_no_one + pynutil.insert(" trillones")
         graph_trillion |= pynutil.delete("000000")
         graph_trillion += insert_space

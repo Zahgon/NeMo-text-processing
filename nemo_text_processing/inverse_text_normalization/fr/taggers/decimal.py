@@ -37,37 +37,7 @@ def get_quantity(decimal: 'pynini.FstLike', cardinal_up_to_thousand: 'pynini.Fst
         decimal: decimal FST
         cardinal_up_to_million: cardinal FST
     """
-    numbers = cardinal_up_to_thousand @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix = pynini.union(
-        "million",
-        "millions",
-        "milliard",
-        "milliards",
-        "billion",
-        "billions",
-        "billiard",
-        "billiards",
-        "trillion",
-        "trillions",
-        "trilliard",
-        "trilliards",
-    )
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + (
-            pynini.union(delete_hyphen, delete_extra_space)
-        )  # Can be written either as 'deux-millions' or 'deux millions' depending on whether it registers as a noun or part of cardinal.
-        + pynutil.insert(" quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert(" quantity: \"") + suffix + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

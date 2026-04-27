@@ -25,7 +25,7 @@ from nemo_text_processing.utils.logging import logger
 class PostProcessingFst:
     """
     Finite state transducer that post-processes an entire Vietnamese sentence after verbalization is complete, e.g.
-    removes extra spaces around punctuation marks " ( một trăm hai mươi ba ) " -> "(một trăm hai mươi ba)"
+    removes extra spaces around punctuation marks " ( má»™t trÄƒm hai mÆ°Æ¡i ba ) " -> "(má»™t trÄƒm hai mÆ°Æ¡i ba)"
 
     Args:
         cache_dir: path to a dir with .far grammar file. Set to None to avoid using cache.
@@ -53,52 +53,11 @@ class PostProcessingFst:
         Returns Vietnamese-specific punctuation configuration.
         This method can be easily modified or extended for different Vietnamese punctuation rules.
         """
-        return {
-            # Punctuation that should not have space before them
-            'no_space_before': [",", ".", "!", "?", ":", ";", ")", r"\]", "}"],
-            # Punctuation that should not have space after them
-            'no_space_after': ["(", r"\[", "{"],
-            # Punctuation that can have space before them (exceptions)
-            'allow_space_before': ["&", "-", "—", "–", "(", r"\[", "{", "\"", "'", "«", "»"],
-            # Special Vietnamese punctuation handling
-            'vietnamese_special': {
-                # Vietnamese quotation marks
-                'quotes': ["\"", "'", "«", "»", """, """, "'", "'"],
-                # Vietnamese dashes and separators
-                'dashes': ["-", "—", "–"],
-                # Vietnamese brackets
-                'brackets': ["(", ")", r"\[", r"\]", "{", "}"],
-            },
-        }
+        pass
 
     def set_punct_dict(self):
         # Vietnamese punctuation marks that might need special handling
-        self.punct_marks = {
-            "'": [
-                "'",
-                '´',
-                'ʹ',
-                'ʻ',
-                'ʼ',
-                'ʽ',
-                'ʾ',
-                'ˈ',
-                'ˊ',
-                'ˋ',
-                '˴',
-                'ʹ',
-                '΄',
-                '`',
-                '´',
-                '’',
-                '‛',
-                '′',
-                '‵',
-                'ꞌ',
-                '＇',
-                '｀',
-            ],
-        }
+        pass
 
     def get_punct_postprocess_graph(self):
         """
@@ -107,33 +66,4 @@ class PostProcessingFst:
         Uses dynamic configuration for flexible punctuation handling.
         Vietnamese punctuation spacing rules are defined in get_vietnamese_punct_config().
         """
-        # Get dynamic punctuation configuration
-        punct_config = self.get_vietnamese_punct_config()
-
-        # Extract configuration
-        no_space_before_punct = punct_config['no_space_before']
-        no_space_after_punct = punct_config['no_space_after']
-
-        # Create FSTs for punctuation rules
-        no_space_before_punct_fst = pynini.union(*no_space_before_punct)
-        no_space_after_punct_fst = pynini.union(*no_space_after_punct)
-
-        delete_space = pynutil.delete(NEMO_SPACE)
-
-        # Rule 1: Remove space before punctuation (primary rule)
-        remove_space_before = pynini.cdrewrite(
-            delete_space + no_space_before_punct_fst,  # " ," -> ","
-            "",  # any context before
-            "",  # any context after
-            NEMO_SIGMA,
-        ).optimize()
-
-        # Rule 2: Remove space after opening brackets
-        remove_space_after = pynini.cdrewrite(
-            no_space_after_punct_fst + delete_space, "", "", NEMO_SIGMA  # "( " -> "("
-        ).optimize()
-
-        # Combine the two main rules
-        graph = pynini.compose(remove_space_before, remove_space_after)
-
-        return graph.optimize()
+        pass

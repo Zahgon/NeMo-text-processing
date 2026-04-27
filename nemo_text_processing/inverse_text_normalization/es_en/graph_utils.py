@@ -28,30 +28,4 @@ def int_to_roman(fst: 'pynini.FstLike') -> 'pynini.FstLike':
     Args:
         fst: Any fst. Composes fst onto Roman conversion outputs.
     """
-
-    def _load_roman(file: str):
-        roman_numerals = pynini.string_file(get_abs_path(file))
-        return pynini.invert(roman_numerals)
-
-    digit = _load_roman("data/roman/digit.tsv")
-    ties = _load_roman("data/roman/ties.tsv")
-    hundreds = _load_roman("data/roman/hundreds.tsv")
-    thousands = _load_roman("data/roman/thousands.tsv")
-
-    graph = (
-        digit
-        | ties + (digit | pynutil.add_weight(pynutil.delete("0"), 0.01))
-        | (
-            hundreds
-            + (ties | pynutil.add_weight(pynutil.delete("0"), 0.01))
-            + (digit | pynutil.add_weight(pynutil.delete("0"), 0.01))
-        )
-        | (
-            thousands
-            + (hundreds | pynutil.add_weight(pynutil.delete("0"), 0.01))
-            + (ties | pynutil.add_weight(pynutil.delete("0"), 0.01))
-            + (digit | pynutil.add_weight(pynutil.delete("0"), 0.01))
-        )
-    ).optimize()
-
-    return fst @ graph
+    pass

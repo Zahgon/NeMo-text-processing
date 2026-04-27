@@ -48,13 +48,7 @@ class TokenParser:
 
         Returns list of dictionaries
         """
-        l = list()
-        while self.parse_ws():
-            token = self.parse_token()
-            if not token:
-                break
-            l.append(token)
-        return l
+        pass
 
     def parse_token(self) -> Dict[str, Union[str, dict]]:
         """
@@ -63,20 +57,7 @@ class TokenParser:
 
         Returns: K, G as dictionary values
         """
-        d = OrderedDict()
-        key = self.parse_string_key()
-        if key is None:
-            return None
-        self.parse_ws()
-        if key == PRESERVE_ORDER_KEY:
-            self.parse_char(":")
-            self.parse_ws()
-            value = self.parse_chars("true")
-        else:
-            value = self.parse_token_value()
-
-        d[key] = value
-        return d
+        pass
 
     def parse_token_value(self) -> Union[str, dict]:
         """
@@ -85,25 +66,7 @@ class TokenParser:
 
         Returns: string or dictionary
         """
-        if self.char == ":":
-            self.parse_char(":")
-            self.parse_ws()
-            self.parse_char("\"")
-            value_string = self.parse_string_value()
-            self.parse_char("\"")
-            return value_string
-        elif self.char == "{":
-            d = OrderedDict()
-            self.parse_char("{")
-            list_token_dicts = self.parse()
-            # flatten tokens
-            for tok_dict in list_token_dicts:
-                for k, v in tok_dict.items():
-                    d[k] = v
-            self.parse_char("}")
-            return d
-        else:
-            raise ValueError()
+        pass
 
     def parse_char(self, exp) -> bool:
         """
@@ -114,9 +77,7 @@ class TokenParser:
 
         Returns true if successful
         """
-        assert self.char == exp
-        self.read()
-        return True
+        pass
 
     def parse_chars(self, exp) -> bool:
         """
@@ -127,10 +88,7 @@ class TokenParser:
 
         Returns true if successful
         """
-        ok = False
-        for x in exp:
-            ok |= self.parse_char(x)
-        return ok
+        pass
 
     def parse_string_key(self) -> str:
         """
@@ -138,17 +96,7 @@ class TokenParser:
 
         Returns parsed string key
         """
-        assert self.char not in string.whitespace and self.char != EOS
-        incl_criterium = string.ascii_letters + "_"
-        l = []
-        while self.char in incl_criterium:
-            l.append(self.char)
-            if not self.read():
-                raise ValueError()
-
-        if not l:
-            return None
-        return "".join(l)
+        pass
 
     def parse_string_value(self) -> str:
         """
@@ -156,17 +104,7 @@ class TokenParser:
 
         Returns parsed string value
         """
-        # assert self.char not in string.whitespace and self.char != EOS
-        assert self.char != EOS
-        l = []
-        while self.char != "\"" or self.text[self.index + 1] != " ":
-            l.append(self.char)
-            if not self.read():
-                raise ValueError()
-
-        if not l:
-            return None
-        return "".join(l)
+        pass
 
     def parse_ws(self):
         """
@@ -174,10 +112,7 @@ class TokenParser:
 
         Returns true if not EOS after parsing
         """
-        not_eos = self.char != EOS
-        while not_eos and self.char == " ":
-            not_eos = self.read()
-        return not_eos
+        pass
 
     def read(self):
         """
@@ -185,9 +120,4 @@ class TokenParser:
 
         Returns true if not EOS
         """
-        if self.index < self.len_text - 1:  # should be unique
-            self.index += 1
-            self.char = self.text[self.index]
-            return True
-        self.char = EOS
-        return False
+        pass

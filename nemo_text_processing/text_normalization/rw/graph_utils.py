@@ -163,16 +163,7 @@ def capitalized_input_graph(
         original_graph_weight: weight to add to the original `graph`
         capitalized_graph_weight: weight to add to the capitalized graph
     """
-    capitalized_graph = pynini.compose(TO_LOWER + NEMO_SIGMA, graph).optimize()
-
-    if original_graph_weight is not None:
-        graph = pynutil.add_weight(graph, weight=original_graph_weight)
-
-    if capitalized_graph_weight is not None:
-        capitalized_graph = pynutil.add_weight(capitalized_graph, weight=capitalized_graph_weight)
-
-    graph |= capitalized_graph
-    return graph
+    pass
 
 
 def generator_main(file_name: str, graphs: Dict[str, "pynini.FstLike"]):
@@ -183,11 +174,7 @@ def generator_main(file_name: str, graphs: Dict[str, "pynini.FstLike"]):
         file_name: exported file name
         graphs: Mapping of a rule name and Pynini WFST graph to be exported
     """
-    exporter = export.Exporter(file_name)
-    for rule, graph in graphs.items():
-        exporter[rule] = graph.optimize()
-    exporter.close()
-    logger.info(f"Created {file_name}")
+    pass
 
 
 def get_plurals(fst):
@@ -199,7 +186,7 @@ def get_plurals(fst):
 
     Returns plurals to given singular forms
     """
-    return SINGULAR_TO_PLURAL @ fst
+    pass
 
 
 def get_singulars(fst):
@@ -211,7 +198,7 @@ def get_singulars(fst):
 
     Returns singulars to given plural forms
     """
-    return PLURAL_TO_SINGULAR @ fst
+    pass
 
 
 def convert_space(fst) -> "pynini.FstLike":
@@ -225,7 +212,7 @@ def convert_space(fst) -> "pynini.FstLike":
 
     Returns output fst where breaking spaces are converted to non breaking spaces
     """
-    return fst @ pynini.cdrewrite(pynini.cross(NEMO_SPACE, NEMO_NON_BREAKING_SPACE), "", "", NEMO_SIGMA)
+    pass
 
 
 class GraphFst:
@@ -253,15 +240,15 @@ class GraphFst:
         """
         Returns true if FAR can be loaded
         """
-        return self.far_path.exists()
+        pass
 
     @property
     def fst(self) -> "pynini.FstLike":
-        return self._fst
+        pass
 
     @fst.setter
     def fst(self, fst):
-        self._fst = fst
+        pass
 
     def add_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -273,7 +260,7 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        return pynutil.insert(f"{self.name} {{ ") + fst + pynutil.insert(" }")
+        pass
 
     def delete_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -285,13 +272,4 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        res = (
-            pynutil.delete(f"{self.name}")
-            + delete_space
-            + pynutil.delete("{")
-            + delete_space
-            + fst
-            + delete_space
-            + pynutil.delete("}")
-        )
-        return res @ pynini.cdrewrite(pynini.cross("\u00a0", " "), "", "", NEMO_SIGMA)
+        pass

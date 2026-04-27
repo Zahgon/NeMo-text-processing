@@ -30,28 +30,7 @@ like the Google text normalization data https://www.kaggle.com/richardwilliamspr
 
 
 def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument("--input", help="input file path", type=str)
-    parser.add_argument(
-        "--lang",
-        help="language",
-        choices=['ar', 'de', 'en', 'es', 'fr', 'hu', 'it', 'ru', 'sv', 'zh', 'hy', 'hi', 'ko', 'vi'],
-        default="en",
-        type=str,
-    )
-    parser.add_argument(
-        "--input_case", help="input capitalization", choices=["lower_cased", "cased"], default="cased", type=str
-    )
-    parser.add_argument(
-        "--cat",
-        dest="category",
-        help="focus on class only (" + ", ".join(known_types) + ")",
-        type=str,
-        default=None,
-        choices=known_types,
-    )
-    parser.add_argument("--filter", action='store_true', help="clean data for normalization purposes")
-    return parser.parse_args()
+    pass
 
 
 if __name__ == "__main__":

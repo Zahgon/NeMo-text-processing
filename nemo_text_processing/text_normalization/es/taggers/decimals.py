@@ -44,27 +44,14 @@ def get_quantity(decimal_graph: "pynini.FstLike", cardinal_graph: "pynini.FstLik
         decimal_graph: DecimalFST
         cardinal_graph: CardinalFST
     """
-    numbers = pynini.closure(NEMO_DIGIT, 1, 6) @ cardinal_graph
-    numbers = pynini.cdrewrite(pynutil.delete(cardinal_separator), "", "", NEMO_SIGMA) @ numbers
-
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers  # The cardinal we're passing only produces 'un' for one, so gender agreement is safe (all quantities are masculine). Limit to 10^6 power.
-        + pynutil.insert('"')
-        + NEMO_SPACE
-        + pynutil.insert('quantity: "')
-        + quantities
-        + pynutil.insert('"')
-    )
-    res |= decimal_graph + NEMO_SPACE + pynutil.insert('quantity: "') + quantities + pynutil.insert('"')
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
         -11,4006 billones -> decimal { negative: "true" integer_part: "once"  fractional_part: "cuatro cero cero seis" quantity: "billones" preserve_order: true }
-        1 billón -> decimal { integer_part: "un" quantity: "billón" preserve_order: true }
+        1 billÃ³n -> decimal { integer_part: "un" quantity: "billÃ³n" preserve_order: true }
     Args:
         cardinal: CardinalFst
         deterministic: if True will provide a single transduction option,
@@ -98,7 +85,7 @@ class DecimalFst(GraphFst):
             )
 
         # Need to strip apocope everywhere BUT end of string
-        reverse_apocope = pynini.string_map([("un", "uno"), ("ún", "uno")])
+        reverse_apocope = pynini.string_map([("un", "uno"), ("Ãºn", "uno")])
         apply_reverse_apocope = pynini.cdrewrite(reverse_apocope, "", NEMO_SPACE, NEMO_SIGMA)
         graph @= apply_reverse_apocope
 

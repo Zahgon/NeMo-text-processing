@@ -22,20 +22,18 @@ from pynini.lib import pynutil
 from nemo_text_processing.text_normalization.en.graph_utils import NEMO_SIGMA, delete_space
 from nemo_text_processing.text_normalization.en.utils import load_labels
 
-NEMO_ALPHA_HE = pynini.union(*"אבגדהוזחטיכלמםנןסעפףצץקרשת").optimize()
-delete_and = pynutil.delete("ו")
+NEMO_ALPHA_HE = pynini.union(*"×�×‘×’×“×”×•×–×—×˜×™×›×œ×ž×�× ×Ÿ×¡×¢×¤×£×¦×¥×§×¨×©×ª").optimize()
+delete_and = pynutil.delete("×•")
 delete_optional_and = delete_and.ques
 
 ####################
 MIN_NEG_WEIGHT = -0.0001
 MIN_POS_WEIGHT = 0.0001
-MINUS = pynini.union("מינוס").optimize()
+MINUS = pynini.union("×ž×™× ×•×¡").optimize()
 
 
 def string_map_cased(input_file: str):
-    labels = load_labels(input_file)
-    whitelist = pynini.string_map(labels).invert().optimize()
-    return whitelist
+    pass
 
 
 def apply_fst(text, fst):
@@ -44,10 +42,7 @@ def apply_fst(text, fst):
     If no valid path accepts input string, returns an
     error.
     """
-    try:
-        print(pynini.shortestpath(text @ fst).string())
-    except pynini.FstOpError:
-        print(f"Error: No valid output with given input: '{text}'")
+    pass
 
 
 class GraphFst:
@@ -75,15 +70,15 @@ class GraphFst:
         """
         Returns true if FAR can be loaded
         """
-        return self.far_path.exists()
+        pass
 
     @property
     def fst(self) -> "pynini.FstLike":
-        return self._fst
+        pass
 
     @fst.setter
     def fst(self, fst):
-        self._fst = fst
+        pass
 
     def add_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -95,7 +90,7 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        return pynutil.insert(f"{self.name} {{ ") + fst + pynutil.insert(" }")
+        pass
 
     def delete_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -107,13 +102,4 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        res = (
-            pynutil.delete(f"{self.name}")
-            + delete_space
-            + pynutil.delete("{")
-            + delete_space
-            + fst
-            + delete_space
-            + pynutil.delete("}")
-        )
-        return res @ pynini.cdrewrite(pynini.cross("\u00a0", " "), "", "", NEMO_SIGMA)
+        pass

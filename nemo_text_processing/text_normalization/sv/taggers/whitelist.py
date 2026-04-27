@@ -35,11 +35,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file):
-            whitelist = load_labels(file)
-            if input_case == "lower_cased":
-                whitelist = [[x[0].lower()] + x[1:] for x in whitelist]
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist.tsv"))
         if not deterministic and input_case != "lower_cased":

@@ -47,49 +47,13 @@ class MLMScorer:
         """
         returns list of MLM scores for each sentence in list.
         """
-        return [self.score_sentence(sentence) for sentence in sentences]
+        pass
 
     def score_sentence(self, sentence: str):
         """
         returns MLM score for sentence.
         """
-        assert type(sentence) == str
-
-        tokens = self.tokenizer.tokenize(sentence)
-        mask_idx = []
-        token_type = []
-        attn_mask = []
-        ids = []
-        for m_idx, _ in enumerate(tokens):
-            masked = self.__mask_text__(m_idx, tokens)
-            mask_idx.append(m_idx)
-            ids.append(self.tokenizer.encode(masked))
-            id_len = len(ids[-1])
-            token_type.append([0] * id_len)
-            attn_mask.append([1] * id_len)
-
-        data = {
-            'input_ids': torch.tensor(ids, device=self.device),
-            'attention_mask': torch.tensor(attn_mask, device=self.device),
-            'token_type_ids': torch.tensor(token_type, device=self.device),
-        }
-
-        with torch.no_grad():
-            outputs = self.model(**data)
-            logits = outputs.logits
-
-        scores = []
-        scores_log_prob = 0.0
-
-        for i, m_idx in enumerate(mask_idx):
-            preds = logits[i].squeeze(0)
-            probs = softmax(preds, dim=1)
-            token_id = self.tokenizer.convert_tokens_to_ids([tokens[m_idx]])[0]
-            log_prob = np.log(probs[m_idx + 1, token_id].cpu().numpy()).item()
-            scores.append(log_prob)
-            scores_log_prob += log_prob
-
-        return scores_log_prob
+        pass
 
     def __mask_text__(self, idx: int, tokens: List[str]):
         """

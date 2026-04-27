@@ -34,8 +34,8 @@ def get_quantity(
 ) -> 'pynini.FstLike':
     """
     Returns FST that transforms either a cardinal or decimal followed by a quantity into a numeral,
-    e.g. հինգ միլիոն -> tokens { decimal { integer_part: "5" quantity: "միլիոն" } }
-    e.g. հինգ ամբողջ յոթ միլիարդ -> tokens { decimal { integer_part: "5"  fractional_part: "7" quantity: "միլիարդ" } }
+    e.g. Õ°Õ«Õ¶Õ£ Õ´Õ«Õ¬Õ«Õ¸Õ¶ -> tokens { decimal { integer_part: "5" quantity: "Õ´Õ«Õ¬Õ«Õ¸Õ¶" } }
+    e.g. Õ°Õ«Õ¶Õ£ Õ¡Õ´Õ¢Õ¸Õ²Õ» ÕµÕ¸Õ© Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤ -> tokens { decimal { integer_part: "5"  fractional_part: "7" quantity: "Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤" } }
 
     Args:
         decimal: decimal FST
@@ -45,30 +45,14 @@ def get_quantity(
         TODO add case input support
 
     """
-    numbers = cardinal_up_to_hundred @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix = pynini.union("միլիոն", "միլիարդ", "տրիլիոն")
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + (suffix | "հազար") + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal
-        e.g. հիսուն ու կես տրիլիոն -> decimal { integer_part: "50"  fractional_part: "5" quantity: "տրիլիոն" }
-        e.g. մեկ միլիարդ -> decimal { integer_part: "1" quantity: "միլիարդ" }
+        e.g. Õ°Õ«Õ½Õ¸Ö‚Õ¶ Õ¸Ö‚ Õ¯Õ¥Õ½ Õ¿Ö€Õ«Õ¬Õ«Õ¸Õ¶ -> decimal { integer_part: "50"  fractional_part: "5" quantity: "Õ¿Ö€Õ«Õ¬Õ«Õ¸Õ¶" }
+        e.g. Õ´Õ¥Õ¯ Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤ -> decimal { integer_part: "1" quantity: "Õ´Õ«Õ¬Õ«Õ¡Ö€Õ¤" }
     Args:
         cardinal: CardinalFst
         input_case: accepting either "lower_cased" or "cased" input.
@@ -81,14 +65,14 @@ class DecimalFst(GraphFst):
         cardinal_graph = cardinal.graph_no_exception
 
         graph_decimal = pynini.string_file(get_abs_path("data/numbers/digit.tsv")) | pynini.string_map(
-            [("զրո", "0"), ("կես", "5")]
+            [("Õ¦Ö€Õ¸", "0"), ("Õ¯Õ¥Õ½", "5")]
         )
 
         graph_decimal = pynini.closure(graph_decimal + delete_space) + graph_decimal
         self.only_decimal = graph_decimal.optimize()
 
-        point_first = pynutil.delete("ամբողջ")
-        point_second = pynutil.delete("ու")
+        point_first = pynutil.delete("Õ¡Õ´Õ¢Õ¸Õ²Õ»")
+        point_second = pynutil.delete("Õ¸Ö‚")
 
         graph_fractional = pynutil.insert("fractional_part: \"") + graph_decimal + pynutil.insert("\"")
         graph_integer = pynutil.insert("integer_part: \"") + cardinal_graph + pynutil.insert("\"")

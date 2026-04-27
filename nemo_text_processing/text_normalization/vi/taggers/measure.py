@@ -28,10 +28,10 @@ from nemo_text_processing.text_normalization.vi.utils import get_abs_path
 class MeasureFst(GraphFst):
     """
     Finite state transducer for classifying measure for Vietnamese, e.g.
-        12kg -> measure { cardinal { integer: "mười hai" } units: "ki lô gam" }
-        1kg -> measure { cardinal { integer: "một" } units: "ki lô gam" }
-        0.5kg -> measure { decimal { fractional_part: "năm" } units: "ki lô gam" }
-        -12kg -> measure { negative: "true" cardinal { integer: "mười hai" } units: "ki lô gam" }
+        12kg -> measure { cardinal { integer: "mÆ°á»�i hai" } units: "ki lÃ´ gam" }
+        1kg -> measure { cardinal { integer: "má»™t" } units: "ki lÃ´ gam" }
+        0.5kg -> measure { decimal { fractional_part: "nÄƒm" } units: "ki lÃ´ gam" }
+        -12kg -> measure { negative: "true" cardinal { integer: "mÆ°á»�i hai" } units: "ki lÃ´ gam" }
 
     Args:
         cardinal: CardinalFst
@@ -43,16 +43,7 @@ class MeasureFst(GraphFst):
 
     def _create_measure_subgraph(self, measure_type: str, number_graph, optional_negative, graph_unit):
         """Helper to create measure subgraph pattern - reduces duplication"""
-        return (
-            optional_negative
-            + pynutil.insert(f"{measure_type} {{ ")
-            + number_graph
-            + pynutil.insert(" }")
-            + delete_space
-            + pynutil.insert(" units: \"")
-            + graph_unit
-            + pynutil.insert('"')
-        )
+        pass
 
     def __init__(
         self,
@@ -86,7 +77,7 @@ class MeasureFst(GraphFst):
         graph_unit = graph_metric_units | graph_special_units | graph_standalone_units
 
         # Add compound unit support (unit/unit patterns like km/h)
-        graph_unit_compound = pynini.cross("/", " trên ") + pynutil.insert(NEMO_SPACE) + graph_unit
+        graph_unit_compound = pynini.cross("/", " trÃªn ") + pynutil.insert(NEMO_SPACE) + graph_unit
 
         optional_graph_unit_compound = pynini.closure(
             pynutil.insert(NEMO_SPACE) + graph_unit_compound,

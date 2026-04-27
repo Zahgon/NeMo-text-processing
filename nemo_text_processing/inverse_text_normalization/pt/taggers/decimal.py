@@ -34,51 +34,23 @@ def get_quantity(decimal: 'pynini.FstLike', cardinal_up_to_million: 'pynini.FstL
         decimal: decimal FST
         cardinal_up_to_million: cardinal FST
     """
-    numbers = cardinal_up_to_million @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix = pynini.union(
-        "milhão",
-        "milhões",
-        "bilhão",
-        "bilhões",
-        "trilhão",
-        "trilhões",
-        "quatrilhão",
-        "quatrilhões",
-        "quintilhão",
-        "quintilhões",
-        "sextilhão",
-        "sextilhões",
-    )
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + suffix + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal
-        Decimal point is either "." or ",", determined by whether "ponto" or "vírgula" is spoken.
-            e.g. menos um vírgula dois seis -> decimal { negative: "true" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" }
+        Decimal point is either "." or ",", determined by whether "ponto" or "vÃ­rgula" is spoken.
+            e.g. menos um vÃ­rgula dois seis -> decimal { negative: "true" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" }
             e.g. menos um ponto dois seis -> decimal { negative: "true" integer_part: "1" morphosyntactic_features: "." fractional_part: "26" }
 
         This decimal rule assumes that decimals can be pronounced as:
-        (a cardinal) + ('vírgula' or 'ponto') plus (any sequence of cardinals <1000, including 'zero')
+        (a cardinal) + ('vÃ­rgula' or 'ponto') plus (any sequence of cardinals <1000, including 'zero')
 
         Also writes large numbers in shortened form, e.g.
-            e.g. um vírgula dois seis milhões -> decimal { negative: "false" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" quantity: "milhões" }
-            e.g. dois milhões -> decimal { negative: "false" integer_part: "2" quantity: "milhões" }
-            e.g. mil oitcentos e vinte e quatro milhões -> decimal { negative: "false" integer_part: "1824" quantity: "milhões" }
+            e.g. um vÃ­rgula dois seis milhÃµes -> decimal { negative: "false" integer_part: "1" morphosyntactic_features: "," fractional_part: "26" quantity: "milhÃµes" }
+            e.g. dois milhÃµes -> decimal { negative: "false" integer_part: "2" quantity: "milhÃµes" }
+            e.g. mil oitcentos e vinte e quatro milhÃµes -> decimal { negative: "false" integer_part: "1824" quantity: "milhÃµes" }
     Args:
         cardinal: CardinalFst
 
@@ -92,8 +64,8 @@ class DecimalFst(GraphFst):
         graph_decimal = pynini.closure(graph_decimal + delete_space) + graph_decimal
         self.graph = graph_decimal
 
-        # decimal point can be denoted by 'vírgula' or 'ponto'
-        decimal_point = pynini.cross("vírgula", "morphosyntactic_features: \",\"")
+        # decimal point can be denoted by 'vÃ­rgula' or 'ponto'
+        decimal_point = pynini.cross("vÃ­rgula", "morphosyntactic_features: \",\"")
         decimal_point |= pynini.cross("ponto", "morphosyntactic_features: \".\"")
 
         optional_graph_negative = pynini.closure(

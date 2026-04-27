@@ -37,10 +37,7 @@ def _get_month_graph(input_case: str = INPUT_LOWER_CASED):
     """
     Transducer for month, e.g. march -> march
     """
-    month_graph = pynini.string_file(get_abs_path("data/months.tsv"))
-    if input_case == INPUT_CASED:
-        month_graph |= pynini.string_file(get_abs_path("data/months_cased.tsv"))
-    return month_graph
+    pass
 
 
 def _get_ties_graph(input_case: str):
@@ -48,91 +45,21 @@ def _get_ties_graph(input_case: str):
     Transducer for 20-99 e.g
     twenty three -> 23
     """
-    graph = ties_graph + (delete_space + graph_digit | pynutil.insert("0"))
-    if input_case == INPUT_CASED:
-        graph = capitalized_input_graph(graph)
-    return graph
+    pass
 
 
 def _get_range_graph(input_case: str):
     """
     Transducer for decades (1**0s, 2**0s), centuries (2*00s, 1*00s), millennia (2000s)
     """
-    graph_ties = _get_ties_graph(input_case=input_case)
-    graph = (graph_ties | graph_teen) + delete_space + pynini.cross("hundreds", "00s")
-    graph |= pynini.cross("two", "2") + delete_space + pynini.cross("thousands", "000s")
-    graph |= (
-        (graph_ties | graph_teen)
-        + delete_space
-        + (pynini.closure(NEMO_ALPHA, 1) + (pynini.cross("ies", "y") | pynutil.delete("s")))
-        @ (graph_ties | pynini.cross("ten", "10"))
-        + pynutil.insert("s")
-    )
-    graph @= pynini.union("1", "2") + NEMO_DIGIT + NEMO_DIGIT + NEMO_DIGIT + "s"
-    graph = capitalized_input_graph(graph)
-    return graph
+    pass
 
 
 def _get_year_graph(input_case: str):
     """
     Transducer for year, e.g. twenty twenty -> 2020
     """
-
-    def _get_digits_graph():
-        zero = pynini.cross((pynini.accep("oh") | pynini.accep("o")), "0")
-        graph = zero + delete_space + graph_digit
-        graph.optimize()
-        if input_case == INPUT_CASED:
-            graph = capitalized_input_graph(graph)
-        return graph
-
-    def _get_thousands_graph():
-        graph_ties = _get_ties_graph(input_case)
-        graph_hundred_component = (graph_digit + delete_space + pynutil.delete("hundred")) | pynutil.insert("0")
-        optional_end = pynini.closure(pynutil.delete("and "), 0, 1)
-        graph = (
-            graph_digit
-            + delete_space
-            + pynutil.delete("thousand")
-            + delete_space
-            + graph_hundred_component
-            + delete_space
-            + (graph_teen | graph_ties | (optional_end + pynutil.insert("0") + graph_digit))
-        )
-
-        if input_case == INPUT_CASED:
-            graph = capitalized_input_graph(graph)
-        return graph
-
-    graph_ties = _get_ties_graph(input_case=input_case)
-    graph_digits = _get_digits_graph()
-    graph_thousands = _get_thousands_graph()
-    graph_ad_bc = delete_space + pynini.string_file(get_abs_path("data/year_suffix.tsv")).invert()
-
-    year_graph = (
-        # 20 19, 40 12, 2012 - assuming no limit on the year
-        (graph_teen + delete_space + (graph_ties | graph_digits | graph_teen))
-        | (graph_ties + delete_space + (graph_ties | graph_digits | graph_teen))
-        | graph_thousands
-        | ((graph_digit + delete_space + (graph_ties | graph_digits | graph_teen)) + graph_ad_bc)
-        | ((graph_digit | graph_teen | graph_digits | graph_ties | graph_thousands) + delete_space + graph_ad_bc)
-        | ((graph_ties + delete_space + (graph_ties | graph_digits | graph_teen)) + delete_space + graph_ad_bc)
-        | (
-            (
-                (graph_teen | graph_digit)
-                + delete_space
-                + pynutil.delete("hundred")
-                + pynutil.insert("0")
-                + (graph_digit | pynutil.insert("0"))
-            )
-            + delete_space
-            + graph_ad_bc
-        )
-    )
-    year_graph.optimize()
-    if input_case == INPUT_CASED:
-        year_graph = capitalized_input_graph(year_graph)
-    return year_graph
+    pass
 
 
 class DateFst(GraphFst):

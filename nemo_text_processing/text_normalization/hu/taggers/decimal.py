@@ -23,54 +23,27 @@ quantities = load_labels(get_abs_path("data/number/quantities.tsv"))
 
 
 def inflect_quantities():
-    output = []
-    for quantity in quantities:
-        if len(quantity) == 2:
-            output.append((quantity[0], quantity[1]))
-            output += naive_inflector(quantity[0], quantity[1], True)
-        else:
-            output.append((quantity[0], quantity[0]))
-            tmp = naive_inflector(".", quantity[0], True)
-            real = [t[1] for t in tmp]
-            output += [(t, t) for t in real]
-            if "lli" in quantity[0]:
-                output.append((quantity[0].replace("lli", "li"), quantity[0]))
-                orth = [(x.replace("lli", "li"), x) for x in real]
-                output += orth
-    return output
+    pass
 
 
 def get_quantity(decimal: 'pynini.FstLike', cardinal_up_to_hundred: 'pynini.FstLike') -> 'pynini.FstLike':
     """
     Returns FST that transforms either a cardinal or decimal followed by a quantity into a numeral,
-    e.g. 1 millió -> integer_part: "egy" quantity: "millió"
-    e.g. 1,4 million -> integer_part: "egy" fractional_part: "négy" quantity: "millió"
+    e.g. 1 milliÃ³ -> integer_part: "egy" quantity: "milliÃ³"
+    e.g. 1,4 million -> integer_part: "egy" fractional_part: "nÃ©gy" quantity: "milliÃ³"
 
     Args:
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    numbers = cardinal_up_to_hundred
-    quant_fst = pynini.string_map(inflect_quantities())
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + pynini.accep(" ")
-        + pynutil.insert("quantity: \"")
-        + quant_fst
-        + pynutil.insert("\"")
-    )
-    res |= decimal + pynini.accep(" ") + pynutil.insert("quantity: \"") + quant_fst + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
-        -11,4006 milliárd -> decimal { negative: "true" integer_part: "tizenegy"  fractional_part: "négyezer-hat tízezred" quantity: "milliárd" preserve_order: true }
-        1 milliárd -> decimal { integer_part: "egy" quantity: "milliárd" preserve_order: true }
+        -11,4006 milliÃ¡rd -> decimal { negative: "true" integer_part: "tizenegy"  fractional_part: "nÃ©gyezer-hat tÃ­zezred" quantity: "milliÃ¡rd" preserve_order: true }
+        1 milliÃ¡rd -> decimal { integer_part: "egy" quantity: "milliÃ¡rd" preserve_order: true }
     Args:
         cardinal: CardinalFst
         deterministic: if True will provide a single transduction option,
@@ -88,18 +61,18 @@ class DecimalFst(GraphFst):
         # with a word for the decimal place added
         # see: https://helyesiras.mta.hu/helyesiras/default/numerals
         decimal_number = digit_no_zero @ cardinal_graph + final_zero + pynutil.insert(" tized")
-        decimal_number |= (digit_or_del_zero + NEMO_DIGIT) @ cardinal_graph + final_zero + pynutil.insert(" század")
+        decimal_number |= (digit_or_del_zero + NEMO_DIGIT) @ cardinal_graph + final_zero + pynutil.insert(" szÃ¡zad")
         order = 2
         for decimal_name in [
             "ezred",
             "milliomod",
-            "milliárdod",
+            "milliÃ¡rdod",
             "billiomod",
-            "billiárdod",
+            "billiÃ¡rdod",
             "trilliomod",
-            "trilliárdod",
+            "trilliÃ¡rdod",
         ]:
-            for modifier in ["", "tíz", "száz"]:
+            for modifier in ["", "tÃ­z", "szÃ¡z"]:
                 decimal_number |= (
                     (NEMO_DIGIT**order + (NEMO_DIGIT - "0"))
                     @ pynini.cdrewrite(pynini.cross("0", ""), "[BOS]", "", NEMO_SIGMA)
@@ -109,7 +82,7 @@ class DecimalFst(GraphFst):
                 )
                 order += 1
         if not deterministic:
-            alts = pynini.string_map([("billiomod", "ezer milliárdod"), ("billiárdod", "millió milliárdod")])
+            alts = pynini.string_map([("billiomod", "ezer milliÃ¡rdod"), ("billiÃ¡rdod", "milliÃ³ milliÃ¡rdod")])
             decimal_alts = decimal_number @ pynini.cdrewrite(alts, "", "[EOS]", NEMO_SIGMA)
             decimal_number |= decimal_alts
 

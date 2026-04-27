@@ -22,11 +22,11 @@ from nemo_text_processing.text_normalization.vi.utils import get_abs_path, load_
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying Vietnamese decimal numbers, e.g.
-        -12,5 tỷ -> decimal { negative: "true" integer_part: "mười hai" fractional_part: "năm" quantity: "tỷ" }
-        12.345,67 -> decimal { integer_part: "mười hai nghìn ba trăm bốn mươi lăm" fractional_part: "sáu bảy" }
-        1tr2 -> decimal { integer_part: "một triệu hai trăm nghìn" }
-        818,303 -> decimal { integer_part: "tám trăm mười tám" fractional_part: "ba không ba" }
-        0,2 triệu -> decimal { integer_part: "không" fractional_part: "hai" quantity: "triệu" }
+        -12,5 tá»· -> decimal { negative: "true" integer_part: "mÆ°á»�i hai" fractional_part: "nÄƒm" quantity: "tá»·" }
+        12.345,67 -> decimal { integer_part: "mÆ°á»�i hai nghÃ¬n ba trÄƒm bá»‘n mÆ°Æ¡i lÄƒm" fractional_part: "sÃ¡u báº£y" }
+        1tr2 -> decimal { integer_part: "má»™t triá»‡u hai trÄƒm nghÃ¬n" }
+        818,303 -> decimal { integer_part: "tÃ¡m trÄƒm mÆ°á»�i tÃ¡m" fractional_part: "ba khÃ´ng ba" }
+        0,2 triá»‡u -> decimal { integer_part: "khÃ´ng" fractional_part: "hai" quantity: "triá»‡u" }
     Args:
         cardinal: CardinalFst instance for processing integer parts
     """
@@ -64,7 +64,7 @@ class DecimalFst(GraphFst):
 
         patterns = []
 
-        # 1. Basic decimal patterns: 12,5 and 12,5 tỷ
+        # 1. Basic decimal patterns: 12,5 and 12,5 tá»·
         basic_decimal = (
             (integer_part + pynutil.insert(NEMO_SPACE)).ques
             + pynutil.delete(NEMO_COMMA)
@@ -74,7 +74,7 @@ class DecimalFst(GraphFst):
         patterns.append(basic_decimal)
         patterns.append(basic_decimal + optional_quantity)
 
-        # 2. Thousand-separated decimals: 12.345,67 and 12.345,67 tỷ
+        # 2. Thousand-separated decimals: 12.345,67 and 12.345,67 tá»·
         integer_with_dots = (
             NEMO_DIGIT + pynini.closure(NEMO_DIGIT, 0, 2) + pynini.closure(pynutil.delete(".") + NEMO_DIGIT**3, 1)
         )
@@ -93,7 +93,7 @@ class DecimalFst(GraphFst):
         patterns.append(separated_decimal)
         patterns.append(separated_decimal + optional_quantity)
 
-        # 3. Integer with quantity: 100 triệu
+        # 3. Integer with quantity: 100 triá»‡u
         integer_with_quantity = (
             integer_part
             + pynutil.delete(NEMO_SPACE).ques
@@ -133,10 +133,10 @@ class DecimalFst(GraphFst):
             )
             patterns.append(decimal_abbr_pattern)
 
-        # 6. Compound abbreviations: 1tr2 -> một triệu hai trăm nghìn, 2t3 -> hai tỷ ba trăm triệu
+        # 6. Compound abbreviations: 1tr2 -> má»™t triá»‡u hai trÄƒm nghÃ¬n, 2t3 -> hai tá»· ba trÄƒm triá»‡u
         compound_expansions = {
-            "tr": ("triệu", "trăm nghìn"),  # 1tr2 -> một triệu hai trăm nghìn
-            "t": ("tỷ", "trăm triệu"),  # 2t3 -> hai tỷ ba trăm triệu
+            "tr": ("triá»‡u", "trÄƒm nghÃ¬n"),  # 1tr2 -> má»™t triá»‡u hai trÄƒm nghÃ¬n
+            "t": ("tá»·", "trÄƒm triá»‡u"),  # 2t3 -> hai tá»· ba trÄƒm triá»‡u
         }
 
         for abbr, (major_unit, minor_suffix) in compound_expansions.items():
@@ -162,4 +162,4 @@ class DecimalFst(GraphFst):
     @property
     def final_graph_wo_negative(self):
         """Graph without negative prefix, used by MoneyFst"""
-        return self._final_graph_wo_negative
+        pass

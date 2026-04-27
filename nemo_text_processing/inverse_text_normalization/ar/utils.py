@@ -29,10 +29,7 @@ def num_to_word(x: Union[str, int]):
 
     Returns: spoken representation
     """
-    if isinstance(x, int):
-        x = str(x)
-        x = _inflect.number_to_words(str(x)).replace("-", " ").replace(",", "")
-    return x
+    pass
 
 
 def get_abs_path(rel_path):

@@ -51,9 +51,7 @@ class ElectronicFst(GraphFst):
         domain_common = pynini.string_file(get_abs_path("data/electronic/domain.tsv"))
 
         def add_space_after_char():
-            return pynini.closure(NEMO_NOT_QUOTE - pynini.accep(" ") + insert_space) + (
-                NEMO_NOT_QUOTE - pynini.accep(" ")
-            )
+            pass
 
         verbalize_characters = pynini.cdrewrite(graph_symbols | graph_digit, "", "", NEMO_SIGMA)
 

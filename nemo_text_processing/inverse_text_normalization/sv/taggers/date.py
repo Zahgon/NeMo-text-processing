@@ -1,5 +1,5 @@
 # Copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES.  All rights reserved.
-# Copyright (c) 2023, Jim O'Regan for Språkbanken Tal
+# Copyright (c) 2023, Jim O'Regan for SprÃ¥kbanken Tal
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,9 +37,7 @@ class DateFst(GraphFst):
         super().__init__(name="date", kind="classify")
 
         def force_double_digits(fst: GraphFst):
-            double = (NEMO_DIGIT + NEMO_DIGIT) @ fst
-            single = (pynutil.insert("0") + NEMO_DIGIT) @ (NEMO_DIGIT @ fst)
-            return single | double
+            pass
 
         year = tn_date_tagger.year.invert().optimize()
         decade = tn_date_tagger.decade.invert().optimize()

@@ -31,8 +31,8 @@ from nemo_text_processing.text_normalization.es.graph_utils import ES_MINUS
 class CardinalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals
-        e.g. menos veintitrés -> cardinal { negative: "-" integer: "23"}
-    This class converts cardinals up to (but not including) "un cuatrillón",
+        e.g. menos veintitrÃ©s -> cardinal { negative: "-" integer: "23"}
+    This class converts cardinals up to (but not including) "un cuatrillÃ³n",
     i.e up to "one septillion" in English (10^{24}).
     Cardinals below ten are not converted (in order to avoid
     "vivo en una casa" --> "vivo en 1 casa" and any other odd conversions.)
@@ -85,7 +85,7 @@ class CardinalFst(GraphFst):
         graph_millones = pynini.union(
             graph_hundred_component_at_least_one_none_zero_digit
             + delete_space
-            + (self.delete_word("millones") | self.delete_word("millón")),
+            + (self.delete_word("millones") | self.delete_word("millÃ³n")),
             pynutil.insert("000") + self.delete_word("millones"),  # to allow for 'mil millones'
         )
 
@@ -108,7 +108,7 @@ class CardinalFst(GraphFst):
         graph_billones = pynini.union(
             graph_hundred_component_at_least_one_none_zero_digit
             + delete_space
-            + (self.delete_word("billones") | self.delete_word("billón")),
+            + (self.delete_word("billones") | self.delete_word("billÃ³n")),
         )
 
         graph_mil_billones = pynini.union(
@@ -123,7 +123,7 @@ class CardinalFst(GraphFst):
         graph_trillones = pynini.union(
             graph_hundred_component_at_least_one_none_zero_digit
             + delete_space
-            + (self.delete_word("trillones") | self.delete_word("trillón")),
+            + (self.delete_word("trillones") | self.delete_word("trillÃ³n")),
         )
 
         graph_mil_trillones = pynini.union(
@@ -195,9 +195,4 @@ class CardinalFst(GraphFst):
 
     def delete_word(self, word: str):
         """Capitalizes word for `cased` input"""
-        delete_graph = pynutil.delete(word).optimize()
-        if self.input_case == INPUT_CASED:
-            if len(word) > 0:
-                delete_graph |= pynutil.delete(word[0].upper() + word[1:])
-
-        return delete_graph.optimize()
+        pass

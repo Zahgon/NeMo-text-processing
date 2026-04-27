@@ -33,7 +33,7 @@ from nemo_text_processing.text_normalization.ru.utils import get_abs_path
 class CardinalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals, e.g.
-        "1 001" ->  cardinal { integer: "тысяча один" }
+        "1 001" ->  cardinal { integer: "Ñ‚Ñ‹Ñ�Ñ�Ñ‡Ð° Ð¾Ð´Ð¸Ð½" }
 
     Args:
         number_names: number_names for cardinal and ordinal numbers
@@ -64,7 +64,7 @@ class CardinalFst(GraphFst):
         leading_zeros = pynini.closure(pynini.cross("0", ""))
         self.cardinal_numbers_with_leading_zeros = (leading_zeros + self.cardinal_numbers_default).optimize()
 
-        # "123" -> "один два три"
+        # "123" -> "Ð¾Ð´Ð¸Ð½ Ð´Ð²Ð° Ñ‚Ñ€Ð¸"
         single_digits_graph = pynini.string_file(get_abs_path("data/numbers/cardinals_nominative_case.tsv")).optimize()
         single_digits_graph = pynini.compose(NEMO_DIGIT, single_digits_graph)
         self.single_digits_graph = single_digits_graph + pynini.closure(insert_space + single_digits_graph)
@@ -89,10 +89,10 @@ class CardinalFst(GraphFst):
         final_graph |= pynutil.insert("integer: \"") + pynutil.add_weight(serial_graph, 10) + pynutil.insert("\"")
         self.final_graph = final_graph
 
-        # to cover cases "2-х" -> "двух" (this is not covered by ordinal endings)
+        # to cover cases "2-Ñ…" -> "Ð´Ð²ÑƒÑ…" (this is not covered by ordinal endings)
         final_graph |= pynini.compose(
-            pynini.compose(NEMO_DIGIT ** (1, ...) + pynini.cross('-х', ''), final_graph),
-            NEMO_SIGMA + pynini.accep("х\"") + NEMO_SIGMA,
+            pynini.compose(NEMO_DIGIT ** (1, ...) + pynini.cross('-Ñ…', ''), final_graph),
+            NEMO_SIGMA + pynini.accep("Ñ…\"") + NEMO_SIGMA,
         )
         final_graph = self.add_tokens(final_graph)
         self.fst = final_graph.optimize()
@@ -105,43 +105,12 @@ class CardinalFst(GraphFst):
             alternative_formats: alternative number formats
             mode: "all" - to return graph that includes all Ru cases, "nominative" to return only the nominative form
         """
-        if mode == "all":
-            cardinal_names = number_names['cardinal_number_names']
-        elif mode == "nominative":
-            cardinal_names = number_names['cardinal_names_nominative']
-        else:
-            raise ValueError(f'{mode} is not supported.')
-        one_thousand_alternative = alternative_formats['one_thousand_alternative']
-        separators = alternative_formats['separators']
-
-        cardinal_numbers = cardinal_names | pynini.compose(cardinal_names, one_thousand_alternative)
-        cardinal_numbers = pynini.compose(separators, cardinal_numbers)
-        return cardinal_numbers
+        pass
 
     def get_serial_graph(self):
         """
         Finite state transducer for classifying serial.
             The serial is a combination of digits, letters and dashes, e.g.:
-            c325-b -> tokens { cardinal { integer: "си три два пять би" } }
+            c325-b -> tokens { cardinal { integer: "Ñ�Ð¸ Ñ‚Ñ€Ð¸ Ð´Ð²Ð° Ð¿Ñ�Ñ‚ÑŒ Ð±Ð¸" } }
         """
-        num_graph = self.single_digits_graph
-
-        alpha = TO_CYRILLIC | RU_ALPHA
-
-        delimiter = insert_space | pynini.cross("-", " ") | pynini.cross("/", " ")
-        letter_num = pynini.closure(alpha + delimiter, 1) + num_graph
-        num_letter = pynini.closure(num_graph + delimiter, 1) + alpha
-        num_delimiter_num = pynini.closure(num_graph + delimiter, 1) + num_graph
-        next_alpha_or_num = pynini.closure(delimiter + (alpha | num_graph))
-        serial_graph = (letter_num | num_letter | num_delimiter_num) + next_alpha_or_num
-
-        # at least 1 alpha and 1 digit is present
-        at_least_one_alpha_num = (
-            NEMO_SIGMA + (RU_ALPHA | pynini.project(TO_CYRILLIC, "input")) + NEMO_SIGMA + NEMO_DIGIT + NEMO_SIGMA
-        ) | (NEMO_SIGMA + NEMO_DIGIT + NEMO_SIGMA + (RU_ALPHA | pynini.project(TO_CYRILLIC, "input")) + NEMO_SIGMA)
-        serial_graph = pynini.compose(at_least_one_alpha_num, serial_graph.optimize()).optimize()
-        # numbers only with 2+ delimiters
-        serial_graph |= (
-            num_graph + delimiter + num_graph + delimiter + num_graph + pynini.closure(delimiter + num_graph)
-        ).optimize()
-        return serial_graph.optimize()
+        pass

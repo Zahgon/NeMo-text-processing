@@ -48,14 +48,7 @@ def get_ties_graph(deterministic: bool = True):
     12 -> thirteen
     20 -> twenty
     """
-    graph = graph_teen | ties_graph + pynutil.delete("0") | ties_graph + insert_space + graph_digit
-
-    if deterministic:
-        graph = graph | pynini.cross("0", "oh") + insert_space + graph_digit
-    else:
-        graph = graph | (pynini.cross("0", "oh") | pynini.cross("0", "zero")) + insert_space + graph_digit
-
-    return graph.optimize()
+    pass
 
 
 def get_four_digit_year_graph(deterministic: bool = True):
@@ -65,53 +58,12 @@ def get_four_digit_year_graph(deterministic: bool = True):
     1219 -> twelve nineteen
     3900 -> thirty nine hundred
     """
-    graph_ties = get_ties_graph(deterministic)
-
-    graph_with_s = (
-        (graph_ties + insert_space + graph_ties)
-        | (graph_teen + insert_space + (ties_graph | pynini.cross("1", "ten")))
-    ) + pynutil.delete("0s")
-
-    graph_with_s |= (graph_teen | graph_ties) + insert_space + pynini.cross("00", "hundred") + pynutil.delete("s")
-    graph_with_s = graph_with_s @ pynini.cdrewrite(
-        pynini.cross("y", "ies") | pynutil.insert("s"), "", "[EOS]", NEMO_SIGMA
-    )
-
-    graph = graph_ties + insert_space + graph_ties
-    graph |= (graph_teen | graph_ties) + insert_space + pynini.cross("00", "hundred")
-
-    thousand_graph = (
-        graph_digit
-        + insert_space
-        + pynini.cross("00", "thousand")
-        + (pynutil.delete("0") | insert_space + graph_digit)
-    )
-    thousand_graph |= (
-        graph_digit
-        + insert_space
-        + pynini.cross("000", "thousand")
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynini.accep("s")
-    )
-
-    graph |= graph_with_s
-    if deterministic:
-        graph = plurals._priority_union(thousand_graph, graph, NEMO_SIGMA)
-    else:
-        graph |= thousand_graph
-
-    return graph.optimize()
+    pass
 
 
 def _get_two_digit_year_with_s_graph():
     # to handle '70s -> seventies
-    graph = (
-        pynini.closure(pynutil.delete("'"), 0, 1)
-        + pynini.compose(
-            ties_graph + pynutil.delete("0s"), pynini.cdrewrite(pynini.cross("y", "ies"), "", "[EOS]", NEMO_SIGMA)
-        )
-    ).optimize()
-    return graph
+    pass
 
 
 def _get_year_graph(cardinal_graph, deterministic: bool = True):
@@ -125,36 +77,18 @@ def _get_year_graph(cardinal_graph, deterministic: bool = True):
     Transducer for year with suffix
     123 A.D., 4200 B.C
     """
-    graph = get_four_digit_year_graph(deterministic)
-    graph = (pynini.union("1", "2") + (NEMO_DIGIT**3) + pynini.closure(pynini.cross(" s", "s") | "s", 0, 1)) @ graph
-
-    graph |= _get_two_digit_year_with_s_graph()
-
-    three_digit_year = (NEMO_DIGIT @ cardinal_graph) + insert_space + (NEMO_DIGIT**2) @ cardinal_graph
-    year_with_suffix = (
-        (get_four_digit_year_graph(deterministic=True) | three_digit_year) + delete_space + insert_space + year_suffix
-    )
-    graph |= year_with_suffix
-    return graph.optimize()
+    pass
 
 
 def _get_two_digit_year(cardinal_graph, single_digits_graph):
-    two_digit_year = NEMO_DIGIT ** (2) @ plurals._priority_union(cardinal_graph, single_digits_graph, NEMO_SIGMA)
-    return two_digit_year
+    pass
 
 
 def _get_financial_period_graph():
     # 1H23 -> first half of twenty three
     # 3Q22 -> third quarter of twenty two
 
-    h_ordinals = pynini.cross('1', 'first') | pynini.cross('2', 'second')
-    q_ordinals = h_ordinals | pynini.cross('3', 'third') | pynini.cross('4', 'fourth')
-
-    h_graph = h_ordinals + pynini.cross('H', ' half')
-    q_graph = q_ordinals + pynini.cross('Q', ' quarter')
-    period_graph = h_graph | q_graph
-
-    return period_graph
+    pass
 
 
 class DateFst(GraphFst):

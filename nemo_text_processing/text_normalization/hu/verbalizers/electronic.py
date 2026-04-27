@@ -66,15 +66,13 @@ class ElectronicFst(GraphFst):
         graph_digit = digit_no_zero | zero
 
         def add_space_after_char():
-            return pynini.closure(NEMO_NOT_QUOTE - accept_space + pynutil.insert(NEMO_SPACE)) + (
-                NEMO_NOT_QUOTE - accept_space
-            )
+            pass
 
         hungarian_at = [
             "kukacjel ",
             "csiga ",
-            "ormány ",
-            "farkas á ",
+            "ormÃ¡ny ",
+            "farkas Ã¡ ",
             "bejgli ",
             "at-jel ",
         ]

@@ -32,13 +32,7 @@ suppletive = pynini.string_file(get_abs_path("data/measure/suppletive.tsv"))
 
 
 def singular_to_plural():
-    _o = NEMO_SIGMA + pynini.cross("o", "") + pynutil.insert("i")
-    _a = NEMO_SIGMA + pynini.cross("a", "") + pynutil.insert("e")
-    _e = NEMO_SIGMA + pynini.cross("e", "") + pynutil.insert("i")
-
-    graph_plural = plurals._priority_union(suppletive, pynini.union(_o, _a, _e), NEMO_SIGMA).optimize()
-
-    return graph_plural
+    pass
 
 
 class MeasureFst(GraphFst):

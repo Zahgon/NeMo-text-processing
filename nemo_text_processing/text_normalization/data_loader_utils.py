@@ -72,23 +72,7 @@ def _load_kaggle_text_norm_file(file_path: str, to_lower: bool) -> List[Instance
 
     Returns: flat list of instances
     """
-    res = []
-    with open(file_path, 'r') as fp:
-        for line in fp:
-            parts = line.strip().split("\t")
-            if parts[0] == "<eos>":
-                res.append(Instance(token_type=EOS_TYPE, un_normalized="", normalized=""))
-            else:
-                l_type, l_token, l_normalized = parts
-                if to_lower:
-                    l_token = l_token.lower()
-                    l_normalized = l_normalized.lower()
-
-                if l_type == PLAIN_TYPE:
-                    res.append(Instance(token_type=l_type, un_normalized=l_token, normalized=l_token))
-                elif l_type != PUNCT_TYPE:
-                    res.append(Instance(token_type=l_type, un_normalized=l_token, normalized=l_normalized))
-    return res
+    pass
 
 
 def load_files(file_paths: List[str], load_func=_load_kaggle_text_norm_file, to_lower: bool = True) -> List[Instance]:
@@ -101,10 +85,7 @@ def load_files(file_paths: List[str], load_func=_load_kaggle_text_norm_file, to_
 
     Returns: flat list of instances
     """
-    res = []
-    for file_path in file_paths:
-        res.extend(load_func(file_path=file_path, to_lower=to_lower))
-    return res
+    pass
 
 
 def clean_generic(text: str) -> str:
@@ -116,9 +97,7 @@ def clean_generic(text: str) -> str:
 
     Returns: cleaned string
     """
-    text = text.strip()
-    text = text.lower()
-    return text
+    pass
 
 
 def evaluate(preds: List[str], labels: List[str], input: Optional[List[str]] = None, verbose: bool = True) -> float:
@@ -133,19 +112,7 @@ def evaluate(preds: List[str], labels: List[str], input: Optional[List[str]] = N
 
     Returns accuracy
     """
-    acc = 0
-    nums = len(preds)
-    for i in range(nums):
-        pred_norm = clean_generic(preds[i])
-        label_norm = clean_generic(labels[i])
-        if pred_norm == label_norm:
-            acc = acc + 1
-        else:
-            if input:
-                print(f"input: {json.dumps(input[i])}")
-            print(f"gold: {json.dumps(label_norm)}")
-            print(f"pred: {json.dumps(pred_norm)}")
-    return acc / nums
+    pass
 
 
 def training_data_to_tokens(
@@ -160,13 +127,7 @@ def training_data_to_tokens(
 
     Returns Dict: token type -> (list of un_normalized strings, list of normalized strings)
     """
-    result = defaultdict(lambda: ([], []))
-    for instance in data:
-        if instance.token_type != EOS_TYPE:
-            if category is None or instance.token_type == category:
-                result[instance.token_type][0].append(unicodedata.normalize(NFC, instance.un_normalized))
-                result[instance.token_type][1].append(unicodedata.normalize(NFC, instance.normalized))
-    return result
+    pass
 
 
 def training_data_to_sentences(data: List[Instance]) -> Tuple[List[str], List[str], List[Set[str]]]:
@@ -176,29 +137,7 @@ def training_data_to_sentences(data: List[Instance]) -> Tuple[List[str], List[st
         data: list of instances
     Returns (list of unnormalized sentences, list of normalized sentences, list of sets of categories in a sentence)
     """
-    # split data at EOS boundaries
-    sentences = []
-    sentence = []
-    categories = []
-    sentence_categories = set()
-
-    for instance in data:
-        if instance.token_type == EOS_TYPE:
-            sentences.append(sentence)
-            sentence = []
-            categories.append(sentence_categories)
-            sentence_categories = set()
-        else:
-            sentence.append(instance)
-            sentence_categories.update([instance.token_type])
-    un_normalized = [
-        " ".join([unicodedata.normalize(NFC, instance.un_normalized) for instance in sentence])
-        for sentence in sentences
-    ]
-    normalized = [
-        " ".join([unicodedata.normalize(NFC, instance.normalized) for instance in sentence]) for sentence in sentences
-    ]
-    return un_normalized, normalized, categories
+    pass
 
 
 def post_process_punctuation(text: str) -> str:
@@ -210,31 +149,7 @@ def post_process_punctuation(text: str) -> str:
 
     Returns: text with normalized spaces and quotes
     """
-    text = (
-        text.replace('( ', '(')
-        .replace(' )', ')')
-        .replace('{ ', '{')
-        .replace(' }', '}')
-        .replace('[ ', '[')
-        .replace(' ]', ']')
-        .replace('  ', ' ')
-        .replace('”', '"')
-        .replace("’", "'")
-        .replace("»", '"')
-        .replace("«", '"')
-        .replace("\\", "")
-        .replace("„", '"')
-        .replace("´", "'")
-        .replace("’", "'")
-        .replace('“', '"')
-        .replace("‘", "'")
-        .replace('`', "'")
-        .replace('- -', "--")
-    )
-
-    for punct in "!,.:;?":
-        text = text.replace(f' {punct}', punct)
-    return text.strip()
+    pass
 
 
 def pre_process(text: str) -> str:
@@ -246,13 +161,7 @@ def pre_process(text: str) -> str:
 
     Returns: text with spaces around punctuation marks
     """
-    space_both = '[]'
-    for punct in space_both:
-        text = text.replace(punct, ' ' + punct + ' ')
-
-    # remove extra space
-    text = re.sub(r' +', ' ', text)
-    return text
+    pass
 
 
 def load_file(file_path: str) -> List[str]:
@@ -264,11 +173,7 @@ def load_file(file_path: str) -> List[str]:
 
     Returns: flat list of string
     """
-    res = []
-    with open(file_path, 'r') as fp:
-        for line in fp:
-            res.append(line)
-    return res
+    pass
 
 
 def write_file(file_path: str, data: List[str]):
@@ -280,9 +185,7 @@ def write_file(file_path: str, data: List[str]):
         data: list of string
 
     """
-    with open(file_path, 'w') as fp:
-        for line in data:
-            fp.write(line + '\n')
+    pass
 
 
 def post_process_punct(input: str, normalized_text: str, add_unicode_punct: bool = False):
@@ -301,61 +204,4 @@ def post_process_punct(input: str, normalized_text: str, add_unicode_punct: bool
         normalized_text: output text (output of the TN NN model)
         add_unicode_punct: set to True to handle unicode punctuation marks as well as default string.punctuation (increases post processing time)
     """
-    # in the post-processing WFST graph "``" are repalced with '"" quotes (otherwise single quotes "`" won't be handled correctly)
-    # this function fixes spaces around them based on input sequence, so here we're making the same double quote replacement
-    # to make sure these new double quotes work with this function
-    if "``" in input and "``" not in normalized_text:
-        input = input.replace("``", '"')
-    input = [x for x in input]
-    normalized_text = [x for x in normalized_text]
-    punct_marks = [x for x in string.punctuation if x in input]
-
-    if add_unicode_punct:
-        punct_unicode = [
-            chr(i)
-            for i in range(sys.maxunicode)
-            if category(chr(i)).startswith("P") and chr(i) not in punct_marks and chr(i) in input
-        ]
-        punct_marks = punct_marks.extend(punct_unicode)
-
-    for punct in punct_marks:
-        try:
-            equal = True
-            if input.count(punct) != normalized_text.count(punct):
-                equal = False
-            idx_in, idx_out = 0, 0
-            while punct in input[idx_in:]:
-                idx_out = normalized_text.index(punct, idx_out)
-                idx_in = input.index(punct, idx_in)
-
-                def _is_valid(idx_out, idx_in, normalized_text, input):
-                    """Check if previous or next word match (for cases when punctuation marks are part of
-                    semiotic token, i.e. some punctuation can be missing in the normalized text)"""
-                    return (idx_out > 0 and idx_in > 0 and normalized_text[idx_out - 1] == input[idx_in - 1]) or (
-                        idx_out < len(normalized_text) - 1
-                        and idx_in < len(input) - 1
-                        and normalized_text[idx_out + 1] == input[idx_in + 1]
-                    )
-
-                if not equal and not _is_valid(idx_out, idx_in, normalized_text, input):
-                    idx_in += 1
-                    continue
-                if idx_in > 0 and idx_out > 0:
-                    if normalized_text[idx_out - 1] == " " and input[idx_in - 1] != " ":
-                        normalized_text[idx_out - 1] = ""
-
-                    elif normalized_text[idx_out - 1] != " " and input[idx_in - 1] == " ":
-                        normalized_text[idx_out - 1] += " "
-
-                if idx_in < len(input) - 1 and idx_out < len(normalized_text) - 1:
-                    if normalized_text[idx_out + 1] == " " and input[idx_in + 1] != " ":
-                        normalized_text[idx_out + 1] = ""
-                    elif normalized_text[idx_out + 1] != " " and input[idx_in + 1] == " ":
-                        normalized_text[idx_out] = normalized_text[idx_out] + " "
-                idx_out += 1
-                idx_in += 1
-        except:
-            logger.info(f"Skipping post-processing of {''.join(normalized_text)} for '{punct}'")
-
-    normalized_text = "".join(normalized_text)
-    return re.sub(r' +', ' ', normalized_text)
+    pass

@@ -28,32 +28,14 @@ from nemo_text_processing.inverse_text_normalization.mr.utils import get_abs_pat
 
 
 def get_quantity(decimal, cardinal_fst):
-    numbers = cardinal_fst @ (
-        pynutil.delete(pynini.closure("०")) + pynini.difference(NEMO_DIGIT, "०") + pynini.closure(NEMO_DIGIT)
-    )
-    suffix_labels = load_labels(get_abs_path("/data/numbers/thousands.tsv"))
-    suffix_labels = [x[0] for x in suffix_labels if x[0] != "हजार"]
-    suffix = pynini.union(*suffix_labels).optimize()
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + delete_extra_space
-        + pynutil.insert("quantity: \"")
-        + suffix
-        + pynutil.insert("\"")
-    )
-    res |= decimal + delete_extra_space + pynutil.insert("quantity: \"") + (suffix | "हजार") + pynutil.insert("\"")
-
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals
-        e.g. तेहतीस पूर्णांक तीन -> decimal { integer_part: "३३" fractional_part: "३" }
-        e.g. उणे तेहतीस पूर्णांक तीन लाख -> decimal { negative: "true" integer_part: "३३" fractional_part: "३" quantity: "लाख" }
+        e.g. à¤¤à¥‡à¤¹à¤¤à¥€à¤¸ à¤ªà¥‚à¤°à¥�à¤£à¤¾à¤‚à¤• à¤¤à¥€à¤¨ -> decimal { integer_part: "à¥©à¥©" fractional_part: "à¥©" }
+        e.g. à¤‰à¤£à¥‡ à¤¤à¥‡à¤¹à¤¤à¥€à¤¸ à¤ªà¥‚à¤°à¥�à¤£à¤¾à¤‚à¤• à¤¤à¥€à¤¨ à¤²à¤¾à¤– -> decimal { negative: "true" integer_part: "à¥©à¥©" fractional_part: "à¥©" quantity: "à¤²à¤¾à¤–" }
 
     Args:
         cardinal: CardinalFst
@@ -63,7 +45,7 @@ class DecimalFst(GraphFst):
         super().__init__(name="decimal", kind="classify")
         graph_zero = pynini.string_file(get_abs_path("data/numbers/zero.tsv")).invert()
         graph_digits = pynini.string_file(get_abs_path("data/numbers/digits.tsv")).invert()
-        decimal_word = pynini.cross("पूर्णांक", "")
+        decimal_word = pynini.cross("à¤ªà¥‚à¤°à¥�à¤£à¤¾à¤‚à¤•", "")
         optional_graph_negative = pynini.closure(
             pynutil.insert("negative: ") + pynini.cross(MINUS, "\"true\"") + delete_extra_space,
             0,

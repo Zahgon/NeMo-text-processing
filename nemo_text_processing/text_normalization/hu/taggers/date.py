@@ -22,14 +22,7 @@ from nemo_text_processing.text_normalization.hu.utils import get_abs_path, load_
 
 
 def get_suffixed_days(labels):
-    endings = ["je", "a", "e"]
-    output = []
-    for label in labels:
-        for ending in endings:
-            if label[1].endswith(ending):
-                output.append((f"{label[0]}-{ending}", label[1]))
-                break
-    return output
+    pass
 
 
 def day_inflector(number, day):
@@ -45,22 +38,7 @@ def day_inflector(number, day):
     Returns:
         a list of expanded forms, two per ending.
     """
-    endings = {
-        "e": "ét ének ével éért évé éig eként éül ében én énél ébe ére éhez éből éről étől",
-        "a": "át ának ával áért ává áig aként ául ában án ánál ába ára ához ából áról ától",
-    }
-    output = []
-    daylast = day[-1]
-    for ending in endings[daylast].split(" "):
-        daybase = day[:-1]
-        endtrimmed = ending[1:]
-        if day.endswith("eje"):
-            output.append((f"{number}-j{ending}", f"{daybase}{ending}"))
-            output.append((f"{number}-{ending}", f"{daybase}{ending}"))
-        else:
-            output.append((f"{number}-{ending}", f"{daybase}{ending}"))
-            output.append((f"{number}-{endtrimmed}", f"{daybase}{ending}"))
-    return output
+    pass
 
 
 def day_adj_endings(number, word, basic=True):
@@ -69,48 +47,25 @@ def day_adj_endings(number, word, basic=True):
         1-i -> elseji
         1-ji -> elseji
         1-jei -> elsejei
-        2-i -> másodiki
-        2-ai -> másodikai
+        2-i -> mÃ¡sodiki
+        2-ai -> mÃ¡sodikai
         4-i -> negyediki
         4-ei -> negyedikei
     This is based on other -i adjectives, because these forms are rare.
     """
-    endings_pl = {
-        "e": "iek ieket ieknek iekkel iekért iekké iekig iekként iekben ieken ieknél iekbe iekre iekhez iekből iekről iektől",
-        "a": "iak iakat iaknak iakkal iakért iakká iakig iakként iakban iakon iaknál iakba iakra iakhoz iakból iakról iaktól",
-    }
-    endings_sg = {
-        "e": "i it inek ivel iért ivé iig iként iben in inél ibe ire ihez iből iről itől",
-        "a": "i it inak ival iért ivá iig iként iban in inál iba ira ihoz iból iról itól",
-    }
-    last = word[-1]
-    short = word[:-1]
-    output = []
-    if basic:
-        endings = ["i"]
-    else:
-        endings = endings_sg[last].split(" ") + endings_pl[last].split(" ")
-    for ending in endings:
-        if word == "elseje":
-            output.append((f"{number}-{ending}", f"{short}{ending}"))
-            output.append((f"{number}-j{ending}", f"{short}{ending}"))
-            output.append((f"{number}-{last}{ending}", f"{word}{ending}"))
-        else:
-            output.append((f"{number}-{ending}", f"{short}{ending}"))
-            output.append((f"{number}-{last}{ending}", f"{word}{ending}"))
-    return output
+    pass
 
 
 class DateFst(GraphFst):
     """
     Finite state transducer for classifying date, e.g.
-        "2010. április 1." -> date { year: "kettőezer-tíz" month: "április" day: "elseje" preserve_order: true }
-        "2010. ápr. 1." -> date { year: "kettőezer-tíz" month: "április" day: "elseje" preserve_order: true }
-        "2010. IV. 1." -> date { year: "kettőezer-tíz" month: "április" day: "elseje" preserve_order: true }
-        "2010. 04. 1." -> date { year: "kettőezer-tíz" month: "április" day: "elseje" preserve_order: true }
-        "2010. 04. 1-je" -> date { year: "kettőezer-tíz" month: "április" day: "elseje" preserve_order: true }
-        "2010. 04. 1-jén" -> date { year: "kettőezer-tíz" month: "április" day: "elsején" preserve_order: true }
-        "2010. 04. 1-én" -> date { year: "kettőezer-tíz" month: "április" day: "elsején" preserve_order: true }
+        "2010. Ã¡prilis 1." -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elseje" preserve_order: true }
+        "2010. Ã¡pr. 1." -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elseje" preserve_order: true }
+        "2010. IV. 1." -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elseje" preserve_order: true }
+        "2010. 04. 1." -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elseje" preserve_order: true }
+        "2010. 04. 1-je" -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elseje" preserve_order: true }
+        "2010. 04. 1-jÃ©n" -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elsejÃ©n" preserve_order: true }
+        "2010. 04. 1-Ã©n" -> date { year: "kettÅ‘ezer-tÃ­z" month: "Ã¡prilis" day: "elsejÃ©n" preserve_order: true }
 
     Args:
         cardinal: cardinal GraphFst
@@ -144,8 +99,8 @@ class DateFst(GraphFst):
         self.days_only = pynutil.insert("day: \"") + graph_days_suffixed + pynutil.insert("\"")
 
         # these express from and to, respectively
-        # december 25-től január 27-ig -> from December 25 to January 27
-        self.days_tol = (pynini.closure(NEMO_CHAR) + pynini.union("től", "tól")) @ graph_days_suffixed
+        # december 25-tÅ‘l januÃ¡r 27-ig -> from December 25 to January 27
+        self.days_tol = (pynini.closure(NEMO_CHAR) + pynini.union("tÅ‘l", "tÃ³l")) @ graph_days_suffixed
         self.days_ig = (pynini.closure(NEMO_CHAR) + "ig") @ graph_days_suffixed
 
         delete_leading_zero = (pynutil.delete("0") | (NEMO_DIGIT - "0")) + NEMO_DIGIT

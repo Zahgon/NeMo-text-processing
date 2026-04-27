@@ -25,7 +25,7 @@ teens = pynini.project(pynini.string_file(get_abs_path("data/numbers/teen.tsv"))
 twenties = pynini.project(pynini.string_file(get_abs_path("data/numbers/twenties.tsv")), "input")
 hundreds = pynini.project(pynini.string_file(get_abs_path("data/numbers/hundreds.tsv")), "input")
 
-accents = pynini.string_map([("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u")])
+accents = pynini.string_map([("Ã¡", "a"), ("Ã©", "e"), ("Ã­", "i"), ("Ã³", "o"), ("Ãº", "u")])
 
 if LOCALIZATION == "am":  # Setting localization for central and northern america formatting
     cardinal_separator = pynini.string_map([",", NEMO_SPACE])
@@ -34,14 +34,14 @@ else:
     cardinal_separator = pynini.string_map([".", NEMO_SPACE])
     decimal_separator = pynini.accep(",")
 
-ones = pynini.union("un", "ún")
-fem_ones = pynini.union(pynini.cross("un", "una"), pynini.cross("ún", "una"), pynini.cross("uno", "una"))
+ones = pynini.union("un", "Ãºn")
+fem_ones = pynini.union(pynini.cross("un", "una"), pynini.cross("Ãºn", "una"), pynini.cross("uno", "una"))
 one_to_one_hundred = pynini.union(digits, "uno", tens, teens, twenties, tens + pynini.accep(" y ") + digits)
 fem_hundreds = hundreds @ pynini.cdrewrite(pynini.cross("ientos", "ientas"), "", "", NEMO_SIGMA)
 
 
 ES_MINUS = pynini.union("menos", "Menos", "MENOS").optimize()
-ES_PLUS = pynini.union("más", "Más", "MÁS").optimize()
+ES_PLUS = pynini.union("mÃ¡s", "MÃ¡s", "MÃ�S").optimize()
 
 
 def strip_accent(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -51,7 +51,7 @@ def strip_accent(fst: "pynini.FstLike") -> "pynini.FstLike":
     Args:
         fst: Any fst. Composes vowel conversion onto fst's output strings
     """
-    return fst @ pynini.cdrewrite(accents, "", "", NEMO_SIGMA)
+    pass
 
 
 def shift_cardinal_gender(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -71,25 +71,7 @@ def shift_cardinal_gender(fst: "pynini.FstLike") -> "pynini.FstLike":
     Args:
         fst: Any fst. Composes conversion onto fst's output strings
     """
-    before_mil = (
-        NEMO_SPACE
-        + (pynini.accep("mil") | pynini.accep("milésimo"))
-        + pynini.closure(NEMO_SPACE + hundreds, 0, 1)
-        + pynini.closure(NEMO_SPACE + one_to_one_hundred, 0, 1)
-        + pynini.union(pynini.accep("[EOS]"), pynini.accep('"'), decimal_separator)
-    )
-    before_double_digits = pynini.closure(NEMO_SPACE + one_to_one_hundred, 0, 1) + pynini.union(
-        pynini.accep("[EOS]"), pynini.accep('"')
-    )
-
-    fem_allign = pynini.cdrewrite(fem_hundreds, "", before_mil, NEMO_SIGMA)  # doscientas mil dosciento
-    fem_allign @= pynini.cdrewrite(fem_hundreds, "", before_double_digits, NEMO_SIGMA)  # doscientas mil doscienta
-
-    fem_allign @= pynini.cdrewrite(
-        fem_ones, "", pynini.union("[EOS]", '"', decimal_separator), NEMO_SIGMA
-    )  # If before a quote or EOS, we know it's the end of a string
-
-    return fst @ fem_allign
+    pass
 
 
 def shift_number_gender(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -105,15 +87,7 @@ def shift_number_gender(fst: "pynini.FstLike") -> "pynini.FstLike":
     Args:
         fst: Any fst. Composes conversion onto fst's output strings
     """
-    fem_allign = pynini.cdrewrite(fem_hundreds, "", "", NEMO_SIGMA)
-    fem_allign @= pynini.cdrewrite(
-        fem_ones,
-        "",
-        pynini.union(NEMO_SPACE, pynini.accep("[EOS]"), pynini.accep('"')),
-        NEMO_SIGMA,
-    )  # If before a quote or EOS, we know it's the end of a string
-
-    return fst @ fem_allign
+    pass
 
 
 def strip_cardinal_apocope(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -122,15 +96,12 @@ def strip_cardinal_apocope(fst: "pynini.FstLike") -> "pynini.FstLike":
     affects strings where the final value is a variation of "un".
     e.g.
         "un" -> "uno"
-        "veintiún" -> "veintiuno"
+        "veintiÃºn" -> "veintiuno"
 
     Args:
         fst: Any fst. Composes conversion onto fst's output strings
     """
-    # Since cardinals use apocope by default for large values (e.g. "millón"), this only needs to act on the last instance of one
-    strip = pynini.cross("un", "uno") | pynini.cross("ún", "uno")
-    strip = pynini.cdrewrite(strip, "", pynini.union("[EOS]", '"'), NEMO_SIGMA)
-    return fst @ strip
+    pass
 
 
 def add_cardinal_apocope_fem(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -144,10 +115,7 @@ def add_cardinal_apocope_fem(fst: "pynini.FstLike") -> "pynini.FstLike":
     Args:
         fst: Any fst. Composes conversion onto fst's output strings
     """
-    # Since the stress trigger follows the cardinal string and only affects the preceding sound, this only needs to act on the last instance of one
-    strip = pynini.cross("una", "un") | pynini.cross("veintiuna", "veintiún")
-    strip = pynini.cdrewrite(strip, "", pynini.union("[EOS]", '"'), NEMO_SIGMA)
-    return fst @ strip
+    pass
 
 
 def roman_to_int(fst: "pynini.FstLike") -> "pynini.FstLike":
@@ -160,59 +128,4 @@ def roman_to_int(fst: "pynini.FstLike") -> "pynini.FstLike":
     Args:
         fst: Any fst. Composes fst onto Roman conversion outputs.
     """
-
-    def _load_roman(file: str, upper_casing: bool):
-        roman = load_labels(get_abs_path(file))
-        if upper_casing:
-            roman_numerals = [(x.upper(), y) for x, y in roman]
-        else:
-            roman_numerals = [(x, y) for x, y in roman]
-        return pynini.string_map(roman_numerals)
-
-    # A split between all upper-case and all lower-case Roman numerals is introduced in order to preserve orthographic accuracy,
-    # and to prevent cases in which certain proper nouns e.g. (Li, Xi, Yi, etc.) are transduced to Roman numerals.
-
-    digit_lower = _load_roman("data/roman/digit.tsv", False)
-    digit_upper = _load_roman("data/roman/digit.tsv", True)
-    ties_lower = _load_roman("data/roman/ties.tsv", False)
-    ties_upper = _load_roman("data/roman/ties.tsv", True)
-    hundreds_lower = _load_roman("data/roman/hundreds.tsv", False)
-    hundreds_upper = _load_roman("data/roman/hundreds.tsv", True)
-    thousands_lower = _load_roman("data/roman/thousands.tsv", False)
-    thousands_upper = _load_roman("data/roman/thousands.tsv", True)
-
-    graph = (
-        (digit_upper | digit_lower)
-        | (
-            (ties_upper + (digit_upper | pynutil.add_weight(pynutil.insert("0"), 0.01)))
-            | (ties_lower + (digit_lower | pynutil.add_weight(pynutil.insert("0"), 0.01)))
-        )
-        | (
-            (
-                hundreds_upper
-                + (ties_upper | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (digit_upper | pynutil.add_weight(pynutil.insert("0"), 0.01))
-            )
-            | (
-                hundreds_lower
-                + (ties_lower | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (digit_lower | pynutil.add_weight(pynutil.insert("0"), 0.01))
-            )
-        )
-        | (
-            (
-                thousands_upper
-                + (hundreds_upper | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (ties_upper | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (digit_upper | pynutil.add_weight(pynutil.insert("0"), 0.01))
-            )
-            | (
-                thousands_lower
-                + (hundreds_lower | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (ties_lower | pynutil.add_weight(pynutil.insert("0"), 0.01))
-                + (digit_lower | pynutil.add_weight(pynutil.insert("0"), 0.01))
-            )
-        )
-    ).optimize()
-
-    return graph @ fst
+    pass

@@ -29,7 +29,7 @@ from nemo_text_processing.utils.logging import logger
 NEMO_CHAR = utf8.VALID_UTF8_CHAR
 
 NEMO_DIGIT = byte.DIGIT
-NEMO_ALPHA = pynini.union(*[chr(i) for i in range(ord('가'), ord('힣') + 1)]).optimize()
+NEMO_ALPHA = pynini.union(*[chr(i) for i in range(ord('ê°€'), ord('íž£') + 1)]).optimize()
 NEMO_ALNUM = pynini.union(NEMO_DIGIT, NEMO_ALPHA).optimize()
 NEMO_HEX = pynini.union(*string.hexdigits).optimize()
 NEMO_SPACE = " "
@@ -77,11 +77,7 @@ def generator_main(file_name: str, graphs: Dict[str, "pynini.FstLike"]):
         file_name: exported file name
         graphs: Mapping of a rule name and Pynini WFST graph to be exported
     """
-    exporter = export.Exporter(file_name)
-    for rule, graph in graphs.items():
-        exporter[rule] = graph.optimize()
-    exporter.close()
-    logger.info(f"Created {file_name}")
+    pass
 
 
 def convert_space(fst) -> "pynini.FstLike":
@@ -95,13 +91,11 @@ def convert_space(fst) -> "pynini.FstLike":
 
     Returns output fst where breaking spaces are converted to non breaking spaces
     """
-    return fst @ pynini.cdrewrite(pynini.cross(NEMO_SPACE, "\u00a0"), "", "", NEMO_SIGMA)
+    pass
 
 
 def string_map_cased(input_file: str, input_case: str = "lower_cased"):
-    labels = load_labels(input_file)
-    whitelist = pynini.string_map(labels).invert().optimize()
-    return whitelist
+    pass
 
 
 class GraphFst:
@@ -129,15 +123,15 @@ class GraphFst:
         """
         Returns true if FAR can be loaded
         """
-        return self.far_path.exists()
+        pass
 
     @property
     def fst(self) -> "pynini.FstLike":
-        return self._fst
+        pass
 
     @fst.setter
     def fst(self, fst):
-        self._fst = fst
+        pass
 
     def add_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -149,7 +143,7 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        return pynutil.insert(f"{self.name} {{ ") + fst + pynutil.insert(" }")
+        pass
 
     def delete_tokens(self, fst) -> "pynini.FstLike":
         """
@@ -161,13 +155,4 @@ class GraphFst:
         Returns:
             Fst: fst
         """
-        res = (
-            pynutil.delete(f"{self.name}")
-            + delete_space
-            + pynutil.delete("{")
-            + delete_space
-            + fst
-            + delete_space
-            + pynutil.delete("}")
-        )
-        return res @ pynini.cdrewrite(pynini.cross("\u00a0", " "), "", "", NEMO_SIGMA)
+        pass

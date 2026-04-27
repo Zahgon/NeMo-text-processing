@@ -27,7 +27,7 @@ from nemo_text_processing.text_normalization.hi.utils import get_abs_path
 class CardinalFst(GraphFst):
     """
     Finite state transducer for classifying cardinals, e.g.
-        -२३ -> cardinal { negative: "true"  integer: "तेइस" }
+        -à¥¨à¥© -> cardinal { negative: "true"  integer: "à¤¤à¥‡à¤‡à¤¸" }
 
     Args:
         deterministic: if True will provide a single transduction option,
@@ -50,27 +50,18 @@ class CardinalFst(GraphFst):
         self.teens_and_ties = teens_and_ties
 
         # Single digit graph for digit-by-digit reading
-        # e.g., "०७३" -> "शून्य सात तीन"
+        # e.g., "à¥¦à¥­à¥©" -> "à¤¶à¥‚à¤¨à¥�à¤¯ à¤¸à¤¾à¤¤ à¤¤à¥€à¤¨"
         single_digit_graph = digit | zero
         self.single_digits_graph = single_digit_graph + pynini.closure(insert_space + single_digit_graph)
 
         def create_graph_suffix(digit_graph, suffix, zeros_counts):
-            zero = pynutil.add_weight(pynutil.delete(NEMO_ALL_ZERO), -0.1)
-            if zeros_counts == 0:
-                return digit_graph + suffix
-
-            return digit_graph + (zero**zeros_counts) + suffix
+            pass
 
         def create_larger_number_graph(digit_graph, suffix, zeros_counts, sub_graph):
-            insert_space = pynutil.insert(" ")
-            zero = pynutil.add_weight(pynutil.delete(NEMO_ALL_ZERO), -0.1)
-            if zeros_counts == 0:
-                return digit_graph + suffix + insert_space + sub_graph
-
-            return digit_graph + suffix + (zero**zeros_counts) + insert_space + sub_graph
+            pass
 
         # Hundred graph
-        suffix_hundreds = pynutil.insert(" सौ")
+        suffix_hundreds = pynutil.insert(" à¤¸à¥Œ")
         graph_hundreds = create_graph_suffix(digit, suffix_hundreds, 2)
         graph_hundreds |= create_larger_number_graph(digit, suffix_hundreds, 1, digit)
         graph_hundreds |= create_larger_number_graph(digit, suffix_hundreds, 0, teens_ties)
@@ -84,7 +75,7 @@ class CardinalFst(GraphFst):
         self.graph_hundreds_as_thousand = graph_hundreds_as_thousand
 
         # Thousands and Ten thousands graph
-        suffix_thousands = pynutil.insert(" हज़ार")
+        suffix_thousands = pynutil.insert(" à¤¹à¤œà¤¼à¤¾à¤°")
         graph_thousands = create_graph_suffix(digit, suffix_thousands, 3)
         graph_thousands |= create_larger_number_graph(digit, suffix_thousands, 2, digit)
         graph_thousands |= create_larger_number_graph(digit, suffix_thousands, 1, teens_ties)
@@ -100,7 +91,7 @@ class CardinalFst(GraphFst):
         self.graph_ten_thousands = graph_ten_thousands
 
         # Lakhs graph and ten lakhs graph
-        suffix_lakhs = pynutil.insert(" लाख")
+        suffix_lakhs = pynutil.insert(" à¤²à¤¾à¤–")
         graph_lakhs = create_graph_suffix(digit, suffix_lakhs, 5)
         graph_lakhs |= create_larger_number_graph(digit, suffix_lakhs, 4, digit)
         graph_lakhs |= create_larger_number_graph(digit, suffix_lakhs, 3, teens_ties)
@@ -120,7 +111,7 @@ class CardinalFst(GraphFst):
         self.graph_ten_lakhs = graph_ten_lakhs
 
         # Crores graph ten crores graph
-        suffix_crores = pynutil.insert(" करोड़")
+        suffix_crores = pynutil.insert(" à¤•à¤°à¥‹à¤¡à¤¼")
         graph_crores = create_graph_suffix(digit, suffix_crores, 7)
         graph_crores |= create_larger_number_graph(digit, suffix_crores, 6, digit)
         graph_crores |= create_larger_number_graph(digit, suffix_crores, 5, teens_ties)
@@ -142,7 +133,7 @@ class CardinalFst(GraphFst):
         graph_ten_crores.optimize()
 
         # Arabs graph and ten arabs graph
-        suffix_arabs = pynutil.insert(" अरब")
+        suffix_arabs = pynutil.insert(" à¤…à¤°à¤¬")
         graph_arabs = create_graph_suffix(digit, suffix_arabs, 9)
         graph_arabs |= create_larger_number_graph(digit, suffix_arabs, 8, digit)
         graph_arabs |= create_larger_number_graph(digit, suffix_arabs, 7, teens_ties)
@@ -168,7 +159,7 @@ class CardinalFst(GraphFst):
         graph_ten_arabs.optimize()
 
         # Kharabs graph and ten kharabs graph
-        suffix_kharabs = pynutil.insert(" खरब")
+        suffix_kharabs = pynutil.insert(" à¤–à¤°à¤¬")
         graph_kharabs = create_graph_suffix(digit, suffix_kharabs, 11)
         graph_kharabs |= create_larger_number_graph(digit, suffix_kharabs, 10, digit)
         graph_kharabs |= create_larger_number_graph(digit, suffix_kharabs, 9, teens_ties)
@@ -198,7 +189,7 @@ class CardinalFst(GraphFst):
         graph_ten_kharabs.optimize()
 
         # Nils graph and ten nils graph
-        suffix_nils = pynutil.insert(" नील")
+        suffix_nils = pynutil.insert(" à¤¨à¥€à¤²")
         graph_nils = create_graph_suffix(digit, suffix_nils, 13)
         graph_nils |= create_larger_number_graph(digit, suffix_nils, 12, digit)
         graph_nils |= create_larger_number_graph(digit, suffix_nils, 11, teens_ties)
@@ -232,7 +223,7 @@ class CardinalFst(GraphFst):
         graph_ten_nils.optimize()
 
         # Padmas graph and ten padmas graph
-        suffix_padmas = pynutil.insert(" पद्म")
+        suffix_padmas = pynutil.insert(" à¤ªà¤¦à¥�à¤®")
         graph_padmas = create_graph_suffix(digit, suffix_padmas, 15)
         graph_padmas |= create_larger_number_graph(digit, suffix_padmas, 14, digit)
         graph_padmas |= create_larger_number_graph(digit, suffix_padmas, 13, teens_ties)
@@ -270,7 +261,7 @@ class CardinalFst(GraphFst):
         graph_ten_padmas.optimize()
 
         # Shankhs graph and ten shankhs graph
-        suffix_shankhs = pynutil.insert(" शंख")
+        suffix_shankhs = pynutil.insert(" à¤¶à¤‚à¤–")
         graph_shankhs = create_graph_suffix(digit, suffix_shankhs, 17)
         graph_shankhs |= create_larger_number_graph(digit, suffix_shankhs, 16, digit)
         graph_shankhs |= create_larger_number_graph(digit, suffix_shankhs, 15, teens_ties)
@@ -312,7 +303,7 @@ class CardinalFst(GraphFst):
         graph_ten_shankhs.optimize()
 
         # Only match exactly 2 digits to avoid interfering with telephone numbers, decimals, etc.
-        # e.g., "०५" -> "शून्य पाँच"
+        # e.g., "à¥¦à¥«" -> "à¤¶à¥‚à¤¨à¥�à¤¯ à¤ªà¤¾à¤�à¤š"
         single_digit = digit | zero
         graph_leading_zero = zero + insert_space + single_digit
         graph_leading_zero = pynutil.add_weight(graph_leading_zero, 0.5)
@@ -342,7 +333,7 @@ class CardinalFst(GraphFst):
         self.graph_without_leading_zeros = graph_without_leading_zeros.optimize()
 
         # Handle numbers with leading zeros by reading digit-by-digit
-        # e.g., English/arabic "073" -> "शून्य सात तीन", Hindi/devnagri "००५" -> "शून्य शून्य पाँच"
+        # e.g., English/arabic "073" -> "à¤¶à¥‚à¤¨à¥�à¤¯ à¤¸à¤¾à¤¤ à¤¤à¥€à¤¨", Hindi/devnagri "à¥¦à¥¦à¥«" -> "à¤¶à¥‚à¤¨à¥�à¤¯ à¤¶à¥‚à¤¨à¥�à¤¯ à¤ªà¤¾à¤�à¤š"
         cardinal_with_leading_zeros = pynini.compose(
             NEMO_ALL_ZERO + pynini.closure(NEMO_ALL_DIGIT), self.single_digits_graph
         )

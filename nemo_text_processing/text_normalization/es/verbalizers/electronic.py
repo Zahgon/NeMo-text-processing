@@ -57,9 +57,7 @@ class ElectronicFst(GraphFst):
         graph_digit = graph_digit_no_zero | zero
 
         def add_space_after_char():
-            return pynini.closure(NEMO_NOT_QUOTE - pynini.accep(NEMO_SPACE) + pynutil.insert(NEMO_SPACE)) + (
-                NEMO_NOT_QUOTE - pynini.accep(NEMO_SPACE)
-            )
+            pass
 
         verbalize_characters = pynini.cdrewrite(graph_symbols | graph_digit, "", "", NEMO_SIGMA)
 

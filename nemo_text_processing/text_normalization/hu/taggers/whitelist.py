@@ -20,24 +20,13 @@ from nemo_text_processing.text_normalization.hu.utils import get_abs_path, load_
 
 
 def load_inflected(filename, input_case, singular_only=False, skip_spaces=True):
-    forms = []
-    with open(filename) as tsv:
-        for line in tsv.readlines():
-            parts = line.strip().split("\t")
-            key = parts[0]
-            if input_case == "lower_cased":
-                key = parts[0].lower()
-            forms.append((key, parts[1]))
-            if not (skip_spaces and " " in parts[1]):
-                forms += naive_inflector(key, parts[1], singular_only)
-    graph = pynini.string_map(forms)
-    return graph
+    pass
 
 
 class WhiteListFst(GraphFst):
     """
     Finite state transducer for classifying whitelist, e.g.
-        "stb." -> tokens { name: "s a többi" }
+        "stb." -> tokens { name: "s a tÃ¶bbi" }
     This class has highest priority among all classifier grammars. Whitelisted tokens are defined and loaded from "data/whitelist.tsv".
 
     Args:
@@ -51,11 +40,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file):
-            whitelist = load_labels(file)
-            if input_case == "lower_cased":
-                whitelist = [[x[0].lower()] + x[1:] for x in whitelist]
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist.tsv"))
         if not deterministic and input_case != "lower_cased":

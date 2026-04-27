@@ -21,48 +21,7 @@ from nemo_text_processing.inverse_text_normalization.zh.utils import get_abs_pat
 
 
 def get_quantity(decimal, cardinal):
-    suffix = pynini.union(
-        "万",
-        "十万",
-        "百万",
-        "千万",
-        "亿",
-        "十亿",
-        "百亿",
-        "千亿",
-        "萬",
-        "十萬",
-        "百萬",
-        "千萬",
-        "億",
-        "十億",
-        "百億",
-        "千億",
-        "拾萬",
-        "佰萬",
-        "仟萬",
-        "拾億",
-        "佰億",
-        "仟億",
-        "拾万",
-        "佰万",
-        "仟万",
-        "仟亿",
-        "佰亿",
-        "仟亿",
-    )
-    numbers = cardinal
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers
-        + pynutil.insert('"')
-        + pynutil.insert(' quantity: "')
-        + suffix
-        + pynutil.insert('"')
-    )
-    res = res | decimal + pynutil.insert(' quantity: "') + suffix + pynutil.insert('"')
-
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
@@ -70,11 +29,11 @@ class DecimalFst(GraphFst):
         super().__init__(name="decimal", kind="classify")
 
         cardinal_after_decimal = pynini.string_file(get_abs_path("data/numbers/digit-nano.tsv")) | pynini.closure(
-            pynini.cross("零", "0")
+            pynini.cross("é›¶", "0")
         )
-        cardinal_before_decimal = cardinal.just_cardinals | pynini.cross("零", "0")
+        cardinal_before_decimal = cardinal.just_cardinals | pynini.cross("é›¶", "0")
 
-        delete_decimal = pynutil.delete("点") | pynutil.delete("點")
+        delete_decimal = pynutil.delete("ç‚¹") | pynutil.delete("é»ž")
 
         graph_integer = pynutil.insert('integer_part: "') + cardinal_before_decimal + pynutil.insert('" ')
 
@@ -87,8 +46,8 @@ class DecimalFst(GraphFst):
             graph_decimal_no_sign, cardinal.just_cardinals
         )
 
-        graph_negative = pynini.cross("负", 'negative: "-" ') | pynini.cross("負", 'negative: "-" ')
-        graph_negative = pynini.closure(graph_negative, 0, 1)  # captures only one "负"
+        graph_negative = pynini.cross("è´Ÿ", 'negative: "-" ') | pynini.cross("è² ", 'negative: "-" ')
+        graph_negative = pynini.closure(graph_negative, 0, 1)  # captures only one "è´Ÿ"
 
         graph_decimal = graph_negative + graph_decimal_no_sign
         graph_decimal = graph_decimal | (graph_negative + get_quantity(graph_decimal_no_sign, cardinal_before_decimal))

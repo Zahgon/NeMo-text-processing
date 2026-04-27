@@ -34,34 +34,17 @@ def get_quantity(decimal: "pynini.FstLike", cardinal_up_to_hundred: "pynini.FstL
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    numbers = cardinal_up_to_hundred @ (
-        pynutil.delete(pynini.closure("0")) + pynini.difference(NEMO_DIGIT, "0") + pynini.closure(NEMO_DIGIT)
-    )
-
-    suffix_labels = ["מיליון", "מיליארד"]
-    suffix = pynini.union(*suffix_labels).optimize()
-
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers
-        + pynutil.insert('"')
-        + delete_extra_space
-        + pynutil.insert('quantity: "')
-        + suffix
-        + pynutil.insert('"')
-    )
-    res |= decimal + delete_extra_space + pynutil.insert('quantity: "') + (suffix | "אלף") + pynutil.insert('"')
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal in Hebrew
-        e.g. עשרים ושלוש וחצי -> decimal { integer_part: "23" fractional_part: "5" }
-        e.g. אחד נקודה שלוש -> decimal { integer_part: "1"  fractional_part: "3" }
-        e.g. ארבע נקודה חמש מיליון -> decimal { integer_part: "4"  fractional_part: "5" quantity: "מיליון" }
-        e.g. מינוס ארבע מאות נקודה שלוש שתיים שלוש -> decimal { negative: "true" integer_part: "400"  fractional_part: "323" }
-        e.g. אפס נקודה שלושים ושלוש -> decimal { integer_part: "0"  fractional_part: "33" }
+        e.g. ×¢×©×¨×™×� ×•×©×œ×•×© ×•×—×¦×™ -> decimal { integer_part: "23" fractional_part: "5" }
+        e.g. ×�×—×“ × ×§×•×“×” ×©×œ×•×© -> decimal { integer_part: "1"  fractional_part: "3" }
+        e.g. ×�×¨×‘×¢ × ×§×•×“×” ×—×ž×© ×ž×™×œ×™×•×Ÿ -> decimal { integer_part: "4"  fractional_part: "5" quantity: "×ž×™×œ×™×•×Ÿ" }
+        e.g. ×ž×™× ×•×¡ ×�×¨×‘×¢ ×ž×�×•×ª × ×§×•×“×” ×©×œ×•×© ×©×ª×™×™×� ×©×œ×•×© -> decimal { negative: "true" integer_part: "400"  fractional_part: "323" }
+        e.g. ×�×¤×¡ × ×§×•×“×” ×©×œ×•×©×™×� ×•×©×œ×•×© -> decimal { integer_part: "0"  fractional_part: "33" }
     Args:
         cardinal: CardinalFst
     """
@@ -95,7 +78,7 @@ class DecimalFst(GraphFst):
         graph_decimal = pynini.closure(graph_decimal + delete_space) + graph_decimal
         self.graph = graph_decimal
 
-        point = pynutil.delete("נקודה")
+        point = pynutil.delete("× ×§×•×“×”")
 
         graph_negative = pynutil.insert("negative: ") + pynini.cross(MINUS, '"true"') + delete_extra_space
         optional_graph_negative = pynini.closure(

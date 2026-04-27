@@ -39,21 +39,7 @@ def get_quantity(decimal_graph: "pynini.FstLike", cardinal_graph: "pynini.FstLik
         decimal_graph: DecimalFST
         cardinal_graph: CardinalFST
     """
-    delete_separator = pynini.closure(pynutil.delete(" "), 0, 1)
-    numbers = pynini.closure(NEMO_DIGIT, 1, 6) @ cardinal_graph
-    numbers = pynini.cdrewrite(pynutil.delete(delete_separator), "", "", NEMO_SIGMA) @ numbers
-
-    res = (
-        pynutil.insert('integer_part: "')
-        + numbers
-        + pynutil.insert('"')
-        + NEMO_SPACE
-        + pynutil.insert('quantity: "')
-        + quantities
-        + pynutil.insert('"')
-    )
-    res |= decimal_graph + NEMO_SPACE + pynutil.insert('quantity: "') + quantities + pynutil.insert('"')
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

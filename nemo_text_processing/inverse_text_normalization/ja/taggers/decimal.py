@@ -21,18 +21,14 @@ from nemo_text_processing.inverse_text_normalization.ja.utils import get_abs_pat
 
 
 def get_quantity(decimal):
-    suffix = pynini.union("万", "億", "兆")
-    numbers = decimal
-    res = numbers + pynutil.insert(' quantity: "') + suffix + pynutil.insert('"')
-
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal
-        e.g. 一点五 -> decimnl { integer_part: "1" fractional_part: "5" }
-        e.g. 一点五万 -> decimal { integer_part: "1" fractional_part: "5" quantity: "万" }
+        e.g. ä¸€ç‚¹äº” -> decimnl { integer_part: "1" fractional_part: "5" }
+        e.g. ä¸€ç‚¹äº”ä¸‡ -> decimal { integer_part: "1" fractional_part: "5" quantity: "ä¸‡" }
     """
 
     def __init__(self, cardinal: GraphFst):
@@ -43,7 +39,7 @@ class DecimalFst(GraphFst):
         graph_digit = pynini.string_file(get_abs_path("data/numbers/digit.tsv"))
         after_decimal = pynini.closure(graph_zero | graph_digit)
 
-        decimal_point = pynutil.delete("点")
+        decimal_point = pynutil.delete("ç‚¹")
         fractional_component = pynutil.insert("fractional_part: \"") + after_decimal + pynutil.insert("\"")
         integer_component = pynutil.insert("integer_part: \"") + cardinals + pynutil.insert("\"")
 
@@ -51,10 +47,10 @@ class DecimalFst(GraphFst):
         graph_deicimal_larger = get_quantity(graph_decimal_regular)
 
         self.decimal = graph_decimal_regular | graph_deicimal_larger
-        self.just_decimal = cardinals + pynini.cross("点", ".") + after_decimal
+        self.just_decimal = cardinals + pynini.cross("ç‚¹", ".") + after_decimal
 
         graph_sign = (
-            pynutil.insert("negative: \"") + (pynini.cross("マイナス", "-") | pynini.accep("-")) + pynutil.insert("\"")
+            pynutil.insert("negative: \"") + (pynini.cross("ãƒžã‚¤ãƒŠã‚¹", "-") | pynini.accep("-")) + pynutil.insert("\"")
         )
 
         final_graph = (

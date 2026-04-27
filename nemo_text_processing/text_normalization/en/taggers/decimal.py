@@ -35,30 +35,7 @@ def get_quantity(
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    quantity_wo_thousand = pynini.project(quantities, "input") - pynini.union("k", "K", "thousand")
-    if include_abbr:
-        quantity_wo_thousand |= pynini.project(quantities_abbr, "input") - pynini.union("k", "K", "thousand")
-    res = (
-        pynutil.insert("integer_part: \"")
-        + cardinal_up_to_hundred
-        + pynutil.insert("\"")
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynutil.insert(" quantity: \"")
-        + (quantity_wo_thousand @ (quantities | quantities_abbr))
-        + pynutil.insert("\"")
-    )
-    if include_abbr:
-        quantity = quantities | quantities_abbr
-    else:
-        quantity = quantities
-    res |= (
-        decimal
-        + pynini.closure(pynutil.delete(" "), 0, 1)
-        + pynutil.insert("quantity: \"")
-        + quantity
-        + pynutil.insert("\"")
-    )
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):

@@ -40,51 +40,7 @@ def rewrite(cardinal: 'pynini.FstLike') -> 'pynini.FstLike':
     Args:
         cardinal: cardinal FST
     """
-
-    # Traditional orthography does not hyphenate numbers > 100, this will insert hyphens in
-    # those contexts.
-    targets = pynini.string_map(
-        [
-            "et",  # for 'et un/onze'
-            "cent",
-            "mille",
-            "million",
-            "milliard",
-            "billion",
-            "billiard",
-            "trillion",
-            "trilliard",
-        ]
-    )
-    targets += pynini.accep("s").ques
-
-    no_spaces = pynini.closure(NEMO_NOT_SPACE)
-
-    # Valid numbers in reformed orthography will have no spaces.
-    new_orthography_sigma = no_spaces
-
-    # Old orthography will not have these strings. Replacing with character to mark.
-    targets_for_filtering = ("-" + targets) | ("-" + targets + "-") | (targets + "-")
-
-    filter = pynini.cdrewrite(pynini.cross(targets_for_filtering, "#"), "", "", NEMO_SIGMA)  # Invalid for cardinal
-
-    old_orthography_sigma = pynini.difference(NEMO_CHAR, "#")  # Marked character removed from sigma_star.
-    old_orthography_sigma.closure()
-
-    # Only accept strings that occur in old orthography. (This avoids tying two non-related numbers together.)
-    # e.g. mille cent-une -> mille-cent-une
-    filter @= old_orthography_sigma
-
-    # Now know replacements will only work around targets
-    replace_left = pynini.cdrewrite(pynini.cross(" ", "-"), "", targets, NEMO_SIGMA)
-
-    replace_right = pynini.cdrewrite(pynini.cross(" ", "-"), targets, "", NEMO_SIGMA)
-
-    replace = replace_left @ replace_right
-
-    graph = new_orthography_sigma | (filter @ replace)
-
-    return graph @ cardinal
+    pass
 
 
 class CardinalFst(GraphFst):

@@ -57,7 +57,4 @@ def apply_fst(text, fst):
     If no valid path accepts input string, returns an
     error.
     """
-    try:
-        print(pynini.shortestpath(text @ fst).string())
-    except pynini.FstOpError:
-        print(f"Error: No valid output with given input: '{text}'")
+    pass

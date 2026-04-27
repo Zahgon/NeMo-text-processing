@@ -42,15 +42,14 @@ def get_one_to_one_thousand(cardinal: 'pynini.FstLike') -> 'pynini.FstLike':
     Returns:
         fst: A pynini.FstLike object
     """
-    numbers = pynini.string_map([str(_) for _ in range(1, 1000)]) @ cardinal
-    return pynini.project(numbers, "output").optimize()
+    pass
 
 
 class OrdinalFst(GraphFst):
     """
     Finite state transducer for classifying ordinal
-                "21.º" -> ordinal { integer: "vigésimo primero" morphosyntactic_features: "gender_masc" }
-    This class converts ordinal up to the millionth (millonésimo) order (exclusive).
+                "21.Âº" -> ordinal { integer: "vigÃ©simo primero" morphosyntactic_features: "gender_masc" }
+    This class converts ordinal up to the millionth (millonÃ©simo) order (exclusive).
 
     This FST also records the ending of the ordinal (called "morphosyntactic_features"):
     either as gender_masc, gender_fem, or apocope. Also introduces plural feature for non-deterministic graphs.
@@ -73,13 +72,13 @@ class OrdinalFst(GraphFst):
 
         if not deterministic:
             # Some alternative derivations
-            graph_ties = graph_ties | pynini.cross("sesenta", "setuagésimo")
+            graph_ties = graph_ties | pynini.cross("sesenta", "setuagÃ©simo")
 
             graph_teens = graph_teens | pynini.cross("once", "decimoprimero")
             graph_teens |= pynini.cross("doce", "decimosegundo")
 
             graph_digit = graph_digit | pynini.cross("nueve", "nono")
-            graph_digit |= pynini.cross("siete", "sétimo")
+            graph_digit |= pynini.cross("siete", "sÃ©timo")
 
         graph_tens_component = (
             graph_teens
@@ -96,12 +95,12 @@ class OrdinalFst(GraphFst):
         # Need to go up to thousands for fractions
         self.one_to_one_thousand = get_one_to_one_thousand(cardinal_graph)
 
-        thousands = pynini.cross("mil", "milésimo")
+        thousands = pynini.cross("mil", "milÃ©simo")
 
         graph_thousands = (
             strip_accent(self.one_to_one_thousand) + NEMO_SPACE + thousands
         )  # Cardinals become prefix for thousands series. Snce accent on the powers of ten we strip accent from leading words
-        graph_thousands @= pynini.cdrewrite(delete_space, "", "milésimo", NEMO_SIGMA)  # merge as a prefix
+        graph_thousands @= pynini.cdrewrite(delete_space, "", "milÃ©simo", NEMO_SIGMA)  # merge as a prefix
         graph_thousands |= thousands
 
         self.multiples_of_thousand = (cardinal_graph @ graph_thousands).optimize()
@@ -118,7 +117,7 @@ class OrdinalFst(GraphFst):
 
         if not deterministic:
             # The 10's and 20's series can also be two words
-            split_words = pynini.cross("decimo", "décimo ") | pynini.cross("vigesimo", "vigésimo ")
+            split_words = pynini.cross("decimo", "dÃ©cimo ") | pynini.cross("vigesimo", "vigÃ©simo ")
             split_words = pynini.cdrewrite(split_words, "", NEMO_CHAR, NEMO_SIGMA)
             ordinal_graph |= ordinal_graph @ split_words
 

@@ -31,45 +31,24 @@ from nemo_text_processing.text_normalization.hu.utils import (
     naive_inflector,
 )
 
-QUARTERS = {15: "negyed", 30: "fél", 45: "háromnegyed"}
+QUARTERS = {15: "negyed", 30: "fÃ©l", 45: "hÃ¡romnegyed"}
 
 
 def get_all_to_or_from_numbers():
-    output = {}
-    for num, word in QUARTERS.items():
-        current_past = []
-        current_to = []
-        for i in range(1, 60):
-            if i == num:
-                continue
-            elif i < num:
-                current_to.append((str(i), str(num - i)))
-            else:
-                current_past.append((str(i), str(i - num)))
-        output[word] = {}
-        output[word]["past"] = current_past
-        output[word]["to"] = current_to
-    return output
+    pass
 
 
 def get_all_to_or_from_fst(cardinal: GraphFst):
-    numbers = get_all_to_or_from_numbers()
-    output = {}
-    for key in numbers:
-        for when in ["past", "to"]:
-            output[key] = {}
-            map = pynini.string_map(numbers[key][when])
-            output[key][when] = pynini.project(map, "input") @ map @ cardinal.graph
-    return output
+    pass
 
 
 class TimeFst(GraphFst):
     """
     Finite state transducer for classifying time, e.g.
-        "Délelőtt 9 óra est" -> time { hours: "2" minutes: "15" zone: "e s t"}
-        "9 óra" -> time { hours: "2" }
-        "09:00 óra" -> time { hours: "2" }
-        "02:15:10 óra" -> time { hours: "2" minutes: "15" seconds: "10"}
+        "DÃ©lelÅ‘tt 9 Ã³ra est" -> time { hours: "2" minutes: "15" zone: "e s t"}
+        "9 Ã³ra" -> time { hours: "2" }
+        "09:00 Ã³ra" -> time { hours: "2" }
+        "02:15:10 Ã³ra" -> time { hours: "2" minutes: "15" seconds: "10"}
         "negyed 2" -> time { minutes: "15" hours: "1" }
 
     Args:
@@ -80,14 +59,14 @@ class TimeFst(GraphFst):
     def __init__(self, cardinal: GraphFst, deterministic: bool = True):
         super().__init__(name="time", kind="classify", deterministic=deterministic)
 
-        ora_word = pynini.cross("ó", "óra") | pynini.accep("óra")
-        ora_forms = pynini.string_map(naive_inflector("ó", "óra", True) + [("ó", "óra")])
+        ora_word = pynini.cross("Ã³", "Ã³ra") | pynini.accep("Ã³ra")
+        ora_forms = pynini.string_map(naive_inflector("Ã³", "Ã³ra", True) + [("Ã³", "Ã³ra")])
         ora_forms_both = ora_forms | pynini.project(ora_forms, "output")
         perc_word = pynini.cross("p", "perc") | pynini.accep("perc")
         perc_forms = pynini.string_map(naive_inflector("p", "perc", True) + [("p", "perc")])
         perc_forms_both = perc_forms | pynini.project(perc_forms, "output")
-        # masodperc_word = pynini.cross("mp", "másodperc") | pynini.accep("másodperc")
-        masodperc_forms = pynini.string_map(naive_inflector("mp", "másodperc", True) + [("mp", "másodperc")])
+        # masodperc_word = pynini.cross("mp", "mÃ¡sodperc") | pynini.accep("mÃ¡sodperc")
+        masodperc_forms = pynini.string_map(naive_inflector("mp", "mÃ¡sodperc", True) + [("mp", "mÃ¡sodperc")])
         masodperc_forms_both = masodperc_forms | pynini.project(masodperc_forms, "output")
         final_forms = ora_forms_both | perc_forms_both | masodperc_forms_both
         final_suffix = pynutil.insert("suffix: \"") + final_forms + pynutil.insert("\"")
@@ -114,12 +93,7 @@ class TimeFst(GraphFst):
         # minute_words_to_words = pynutil.insert("minutes: \"") + self.minute_words_to_words + pynutil.insert("\"")
 
         def hours_to_pairs():
-            for x in range(1, 13):
-                if x == 12:
-                    y = 1
-                else:
-                    y = x + 1
-                yield y, x
+            pass
 
         hours_next = pynini.string_map([(str(x[0]), str(x[1])) for x in hours_to_pairs()])
         hours_next_inverse = pynini.invert(pynini.project(hours_next, "input") @ cardinal.graph)
@@ -133,7 +107,7 @@ class TimeFst(GraphFst):
         # quarter_words = pynini.string_map(QUARTERS.values())
         # quarter_words_graph = pynutil.insert("minutes: \"") + quarter_words + pynutil.insert("\"")
         # {quarter} {hour_next}
-        # negyed 2 -> minutes: "tizenöt" hours: "egy"
+        # negyed 2 -> minutes: "tizenÃ¶t" hours: "egy"
         self.quarter_prefixed_next_to_current = quarter_map_graph + NEMO_SPACE + hour_numbers_to_words
         # For ITN
         self.quarter_prefixed_next_to_current_words = quarter_map_graph + NEMO_SPACE + hour_words_to_words
@@ -204,7 +178,7 @@ class TimeFst(GraphFst):
             + final_time_zone
             + pynutil.insert(" preserve_order: true")
         )
-        # 02:30 óra
+        # 02:30 Ã³ra
         graph_hm = (
             final_graph_hour
             + pynutil.delete(":")

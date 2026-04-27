@@ -21,30 +21,26 @@ from nemo_text_processing.inverse_text_normalization.ko.utils import get_abs_pat
 
 
 def get_quantity(decimal):
-    suffix = pynini.union("만", "억", "조", "경")
-    numbers = decimal
-    res = numbers + pynutil.insert(' quantity: "') + suffix + pynutil.insert('"')
-
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal
-        e.g. 일점오 -> decimnl { integer_part: "1" fractional_part: "5" }
-        e.g. 일점오만 -> decimal { integer_part: "1" fractional_part: "5" quantity: "만" }
+        e.g. ì�¼ì �ì˜¤ -> decimnl { integer_part: "1" fractional_part: "5" }
+        e.g. ì�¼ì �ì˜¤ë§Œ -> decimal { integer_part: "1" fractional_part: "5" quantity: "ë§Œ" }
     """
 
     def __init__(self, cardinal: GraphFst):
         super().__init__(name="decimal", kind="classify")
 
         cardinals = cardinal.just_cardinals
-        man_as_10000 = pynini.cross("만", "10000")
+        man_as_10000 = pynini.cross("ë§Œ", "10000")
         graph_zero = pynini.string_file(get_abs_path("data/numbers/zero.tsv"))
         graph_digit = pynini.string_file(get_abs_path("data/numbers/digit.tsv"))
         decimal_part = pynini.closure(graph_zero | graph_digit, 1)
 
-        decimal_point = pynutil.delete("점")
+        decimal_point = pynutil.delete("ì �")
         integer_number = cardinals | man_as_10000
         integer_part = pynutil.insert("integer_part: \"") + integer_number + pynutil.insert("\"")
         fractional_part = pynutil.insert("fractional_part: \"") + decimal_part + pynutil.insert("\"")
@@ -54,13 +50,13 @@ class DecimalFst(GraphFst):
         )  # Regular decimal like 1.5
         graph_deicimal_larger = get_quantity(
             graph_decimal_regular
-        )  # If decimal is used to express big numbers like  15000 -> "1.5만"
+        )  # If decimal is used to express big numbers like  15000 -> "1.5ë§Œ"
 
         self.decimal = graph_decimal_regular | graph_deicimal_larger
-        self.just_decimal = cardinals | (cardinals + pynini.cross("점", ".") + decimal_part)
+        self.just_decimal = cardinals | (cardinals + pynini.cross("ì �", ".") + decimal_part)
 
         graph_sign = (
-            pynutil.insert("negative: \"") + (pynini.cross("마이너스", "-") | pynini.accep("-")) + pynutil.insert("\"")
+            pynutil.insert("negative: \"") + (pynini.cross("ë§ˆì�´ë„ˆìŠ¤", "-") | pynini.accep("-")) + pynutil.insert("\"")
         )
 
         final_graph = (

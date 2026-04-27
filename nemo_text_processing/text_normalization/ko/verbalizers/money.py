@@ -1,10 +1,10 @@
-# Copyright (c) 2025, NVIDIA CORPORATION.  All rights reserved.
+# Copyright (c) 2025, NVIDIA CORPORATION. Â All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# Â  Â  http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,10 +30,10 @@ def del_key_val(key: str):
     Output:        <VAL>
 
     Example:
-      input  'integer_part: "삼백오십"'
-      output '삼백오십'
+      input  'integer_part: "ì‚¼ë°±ì˜¤ì‹­"'
+      output 'ì‚¼ë°±ì˜¤ì‹­'
     """
-    return (sp + pynutil.delete(f'{key}: "') + FIELD_VAL + pynutil.delete('"')).optimize()
+    pass
 
 
 def drop_key_val(key: str):
@@ -44,10 +44,10 @@ def drop_key_val(key: str):
     Output:        (nothing)
 
     Example:
-      input  'minor_part: "십"'
+      input  'minor_part: "ì‹­"'
       output ''
     """
-    return (sp + pynutil.delete(f'{key}: "') + FIELD_VAL + pynutil.delete('"')).optimize()
+    pass
 
 
 def drop_key_exact(key: str, val: str):
@@ -58,10 +58,10 @@ def drop_key_exact(key: str, val: str):
     Output:        (nothing)
 
     Example:
-      input  'currency_maj: "원"'
+      input  'currency_maj: "ì›�"'
       output ''
     """
-    return (sp + pynutil.delete(f'{key}: "{val}"')).optimize()
+    pass
 
 
 class MoneyFst(GraphFst):
@@ -71,11 +71,11 @@ class MoneyFst(GraphFst):
     Input tokens:
       tokens { money { integer_part: "..." currency_maj: "..." [minor_part: "..."] } }
 
-    Period (e.g., /월, /년, …) is intentionally NOT handled here.
+    Period (e.g., /ì›”, /ë…„, â€¦) is intentionally NOT handled here.
     Output examples:
-      integer_part: "십" currency_maj: "원"          -> "십원"
-      integer_part: "삼십억" currency_maj: "원"     -> "삼십억원"
-      integer_part: "이백" currency_maj: "달러"     -> "이백 달러"
+      integer_part: "ì‹­" currency_maj: "ì›�"          -> "ì‹­ì›�"
+      integer_part: "ì‚¼ì‹­ì–µ" currency_maj: "ì›�"     -> "ì‚¼ì‹­ì–µì›�"
+      integer_part: "ì�´ë°±" currency_maj: "ë‹¬ëŸ¬"     -> "ì�´ë°± ë‹¬ëŸ¬"
     """
 
     def __init__(self, deterministic: bool = True):
@@ -84,14 +84,14 @@ class MoneyFst(GraphFst):
         # --- fields ---
         integer_part = del_key_val("integer_part")
         minor_part_drop = drop_key_val("minor_part")  # ignore minor for KRW
-        currency_val_any = del_key_val("currency_maj")  # ex) "원", "달러", "유로"
-        won_key_drop = drop_key_exact("currency_maj", "원")  # don't print the key for KRW
+        currency_val_any = del_key_val("currency_maj")  # ex) "ì›�", "ë‹¬ëŸ¬", "ìœ ë¡œ"
+        won_key_drop = drop_key_exact("currency_maj", "ì›�")  # don't print the key for KRW
 
-        # ===== KRW (원) =====
-        # (A) [integer] [원] -> "{integer}원"
-        won_a = integer_part + sp + won_key_drop + pynutil.insert("원")
-        # (B) [원] [integer] -> "{integer}원"
-        won_b = won_key_drop + sp + integer_part + pynutil.insert("원")
+        # ===== KRW (ì›�) =====
+        # (A) [integer] [ì›�] -> "{integer}ì›�"
+        won_a = integer_part + sp + won_key_drop + pynutil.insert("ì›�")
+        # (B) [ì›�] [integer] -> "{integer}ì›�"
+        won_b = won_key_drop + sp + integer_part + pynutil.insert("ì›�")
         won_core = won_a | won_b
         won_core = (won_core + pynini.closure(minor_part_drop, 0, 1)).optimize()
 

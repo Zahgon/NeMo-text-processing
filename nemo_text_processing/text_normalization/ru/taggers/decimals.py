@@ -30,28 +30,18 @@ def prepare_labels_for_insertion(file_path: str):
 
     Args:
         file_path: path to a file (3 columns: a label type e.g.
-        "@@decimal_delimiter@@", a label e.g. "целого", and a weight e.g. "0.1").
+        "@@decimal_delimiter@@", a label e.g. "Ñ†ÐµÐ»Ð¾Ð³Ð¾", and a weight e.g. "0.1").
 
     Returns dictionary mapping from label type to an fst that inserts the labels with the specified weights.
 
     """
-    labels = load_labels(file_path)
-    mapping = defaultdict(list)
-    for k, v, w in labels:
-        mapping[k].append((v, w))
-
-    for k in mapping:
-        mapping[k] = (
-            insert_space
-            + pynini.union(*[pynutil.add_weight(pynutil.insert(end), weight) for end, weight in mapping[k]])
-        ).optimize()
-    return mapping
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
-        "1,08" -> tokens { decimal { integer_part: "одно целая" fractional_part: "восемь сотых} }
+        "1,08" -> tokens { decimal { integer_part: "Ð¾Ð´Ð½Ð¾ Ñ†ÐµÐ»Ð°Ñ�" fractional_part: "Ð²Ð¾Ñ�ÐµÐ¼ÑŒ Ñ�Ð¾Ñ‚Ñ‹Ñ…} }
 
     Args:
         cardinal: CardinalFst
@@ -69,7 +59,7 @@ class DecimalFst(GraphFst):
         delimiter = (
             pynini.cross(",", "")
             + delimiter_map['@@decimal_delimiter@@']
-            + pynini.closure(pynutil.add_weight(pynutil.insert(" и"), 0.5), 0, 1)
+            + pynini.closure(pynutil.add_weight(pynutil.insert(" Ð¸"), 0.5), 0, 1)
         ).optimize()
 
         decimal_endings_map = prepare_labels_for_insertion(get_abs_path("data/numbers/decimal_endings.tsv"))

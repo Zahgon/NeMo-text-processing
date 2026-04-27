@@ -56,46 +56,7 @@ class PostProcessingFst:
                 generator_main(far_file, {"post_process_graph": self.fst})
 
     def set_punct_dict(self):
-        self.punct_marks = {
-            "'": [
-                "'",
-                '´',
-                'ʹ',
-                'ʻ',
-                'ʼ',
-                'ʽ',
-                'ʾ',
-                'ˈ',
-                'ˊ',
-                'ˋ',
-                '˴',
-                'ʹ',
-                '΄',
-                '՚',
-                '՝',
-                'י',
-                '׳',
-                'ߴ',
-                'ߵ',
-                'ᑊ',
-                'ᛌ',
-                '᾽',
-                '᾿',
-                '`',
-                '´',
-                '῾',
-                '‘',
-                '’',
-                '‛',
-                '′',
-                '‵',
-                'ꞌ',
-                '＇',
-                '｀',
-                '𖽑',
-                '𖽒',
-            ],
-        }
+        pass
 
     def get_punct_postprocess_graph(self):
         """
@@ -104,29 +65,4 @@ class PostProcessingFst:
         {``} quotes are converted to {"}. Note, if there are spaces around single quote {'}, they will be kept.
         By default, a space is added after a punctuation mark, and spaces are removed before punctuation marks.
         """
-
-        apply_narrow_space = pynini.cdrewrite(
-            pynini.cross(NEMO_SPACE, NEMO_NARROW_NON_BREAK_SPACE),
-            NEMO_DIGIT,
-            (pynini.closure(NEMO_DIGIT, 1) + pynini.accep("/") + pynini.closure(NEMO_DIGIT, 1)),
-            NEMO_SIGMA,
-        )
-        # converting space between digit and digit/digit to narow space
-        delete_regular_space = pynini.cdrewrite(pynutil.delete(NEMO_SPACE), NEMO_NOT_SPACE, NEMO_NOT_SPACE, NEMO_SIGMA)
-        # deleting all normal spaces
-        reapply_regular_space = pynini.cdrewrite(
-            pynini.cross(NEMO_NARROW_NON_BREAK_SPACE, NEMO_SPACE),
-            NEMO_DIGIT,
-            (pynini.closure(NEMO_DIGIT, 1) + pynini.accep("/") + pynini.closure(NEMO_DIGIT, 1)),
-            NEMO_SIGMA,
-        )
-        # convert narrow space to normal space
-
-        remove_space_around_single_quote = apply_narrow_space @ delete_regular_space @ reapply_regular_space
-
-        # this works if spaces in between (good)
-        # delete space between 2 NEMO_NOT_SPACE（left and right to the space) that are with in a content of NEMO_SIGMA
-
-        graph = remove_space_around_single_quote.optimize()
-
-        return graph
+        pass

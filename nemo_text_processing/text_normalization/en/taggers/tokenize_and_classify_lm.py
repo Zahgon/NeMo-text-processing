@@ -190,34 +190,7 @@ class ClassifyFst(GraphFst):
             )
 
             def get_token_sem_graph(classify_and_verbalize):
-                token_plus_punct = (
-                    pynini.closure(punct + pynutil.insert(" "))
-                    + classify_and_verbalize
-                    + pynini.closure(pynutil.insert(" ") + punct)
-                )
-
-                graph = token_plus_punct + pynini.closure(
-                    (
-                        pynini.compose(pynini.closure(NEMO_WHITE_SPACE, 1), delete_extra_space)
-                        | (pynutil.insert(" ") + punct + pynutil.insert(" "))
-                    )
-                    + token_plus_punct
-                )
-
-                graph |= punct_only + pynini.closure(punct)
-                graph = delete_space + graph + delete_space
-
-                remove_extra_spaces = pynini.closure(NEMO_NOT_SPACE, 1) + pynini.closure(
-                    delete_extra_space + pynini.closure(NEMO_NOT_SPACE, 1)
-                )
-                remove_extra_spaces |= (
-                    pynini.closure(pynutil.delete(" "), 1)
-                    + pynini.closure(NEMO_NOT_SPACE, 1)
-                    + pynini.closure(delete_extra_space + pynini.closure(NEMO_NOT_SPACE, 1))
-                )
-
-                graph = pynini.compose(graph.optimize(), remove_extra_spaces).optimize()
-                return graph
+                pass
 
             self.fst = get_token_sem_graph(classify_and_verbalize)
             no_digits = pynini.closure(pynini.difference(NEMO_CHAR, NEMO_DIGIT))

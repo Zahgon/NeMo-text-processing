@@ -33,23 +33,7 @@ suppletive = pynini.string_file(get_abs_path("data/measure/suppletive.tsv"))
 
 def singular_to_plural():
     # plural endung n/en maskuline Nomen mit den Endungen e, ent, and, ant, ist, or
-    _n = NEMO_SIGMA + pynini.union("e") + pynutil.insert("n")
-    _en = (
-        NEMO_SIGMA
-        + pynini.union("ent", "and", "ant", "ist", "or", "ion", "ik", "heit", "keit", "schaft", "tät", "ung")
-        + pynutil.insert("en")
-    )
-    _nen = NEMO_SIGMA + pynini.union("in") + (pynutil.insert("e") | pynutil.insert("nen"))
-    _fremd = NEMO_SIGMA + pynini.union("ma", "um", "us") + pynutil.insert("en")
-    # maskuline Nomen mit den Endungen eur, ich, ier, ig, ling, ör
-    _e = NEMO_SIGMA + pynini.union("eur", "ich", "ier", "ig", "ling", "ör") + pynutil.insert("e")
-    _s = NEMO_SIGMA + pynini.union("a", "i", "o", "u", "y") + pynutil.insert("s")
-
-    graph_plural = plurals._priority_union(
-        suppletive, pynini.union(_n, _en, _nen, _fremd, _e, _s), NEMO_SIGMA
-    ).optimize()
-
-    return graph_plural
+    pass
 
 
 class MeasureFst(GraphFst):
@@ -59,8 +43,8 @@ class MeasureFst(GraphFst):
         "1 oz" -> measure { cardinal { integer: "zwei" units: "unze" preserve_order: true } }
         "1 million oz" -> measure { cardinal { integer: "eins" quantity: "million" units: "unze" preserve_order: true } }
         This class also converts words containing numbers and letters
-        e.g. "a-8" —> "a acht"
-        e.g. "1,2-a" —> "ein komma zwei a"
+        e.g. "a-8" â€”> "a acht"
+        e.g. "1,2-a" â€”> "ein komma zwei a"
 
     Args:
         cardinal: CardinalFst

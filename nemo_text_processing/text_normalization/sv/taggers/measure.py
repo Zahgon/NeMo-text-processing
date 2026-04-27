@@ -1,5 +1,5 @@
 # Copyright (c) 2021, NVIDIA CORPORATION.  All rights reserved.
-# Copyright (c) 2023, Jim O'Regan for Språkbanken Tal
+# Copyright (c) 2023, Jim O'Regan for SprÃ¥kbanken Tal
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -216,9 +216,9 @@ class MeasureFst(GraphFst):
         math_operations = pynini.string_file(get_abs_path("data/math_operations.tsv"))
         delimiter = pynini.accep(" ") | pynutil.insert(" ")
 
-        equals = pynini.cross("=", "är")
+        equals = pynini.cross("=", "Ã¤r")
         if not deterministic:
-            equals |= pynini.cross("=", "är lika med")
+            equals |= pynini.cross("=", "Ã¤r lika med")
 
         math = (
             (cardinal_graph_ett | SV_ALPHA | greek)
@@ -270,11 +270,4 @@ class MeasureFst(GraphFst):
         Args:
             cardinal: cardinal GraphFst
         """
-        range_graph = cardinal + pynini.cross(pynini.union("-", " - "), " till ") + cardinal
-
-        for x in [" x ", "x"]:
-            range_graph |= cardinal + pynini.cross(x, " gånger ") + cardinal
-
-        for x in ["*", " * "]:
-            range_graph |= cardinal + pynini.cross(x, " gånger ") + cardinal
-        return range_graph.optimize()
+        pass

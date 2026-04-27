@@ -72,27 +72,7 @@ in: |$| out: |one|
 
 
 def parse_args():
-    args = ArgumentParser("map substring to output with FST")
-    args.add_argument("--fst", help="FAR file containing FST", type=str, required=True)
-    args.add_argument(
-        "--grammar", help="tn or itn", type=str, required=False, choices=[ITN_MODE, TN_MODE], default=TN_MODE
-    )
-    args.add_argument(
-        "--rule",
-        help="rule name in FAR file containing FST",
-        type=str,
-        default='tokenize_and_classify',
-        required=False,
-    )
-    args.add_argument(
-        "--text",
-        help="input string",
-        type=str,
-        default="2615 Forest Av, 90601 CA, Santa Clara. 10kg, 12/16/2018, $123.25. 1 Aug 2016.",
-    )
-    args.add_argument("--start", help="start index of substring to be mapped", type=int, required=False)
-    args.add_argument("--end", help="end index of substring to be mapped", type=int, required=False)
-    return args.parse_args()
+    pass
 
 
 EPS = "<eps>"
@@ -107,34 +87,14 @@ def get_word_segments(text: str) -> List[List[int]]:
     """
     Returns word segments from given text based on white space in form of list of index spans.
     """
-    spans = []
-    cur_span = [0]
-    for idx, ch in enumerate(text):
-        if len(cur_span) == 0 and ch != " ":
-            cur_span.append(idx)
-        elif ch == " ":
-            cur_span.append(idx)
-            assert len(cur_span) == 2
-            spans.append(cur_span)
-            cur_span = []
-        elif idx == len(text) - 1:
-            idx += 1
-            cur_span.append(idx)
-            assert len(cur_span) == 2
-            spans.append(cur_span)
-    return spans
+    pass
 
 
 def create_symbol_table() -> pynini.SymbolTable:
     """
     Creates and returns Pynini SymbolTable used to label alignment with ascii instead of integers
     """
-    table = pynini.SymbolTable()
-    for num in range(34, 200):  # ascii alphanum + letter range
-        table.add_symbol(chr(num), num)
-    table.add_symbol(EPS, 0)
-    table.add_symbol(WHITE_SPACE, 32)
-    return table
+    pass
 
 
 def get_string_alignment(fst: pynini.Fst, input_text: str, symbol_table: pynini.SymbolTable):
@@ -144,49 +104,21 @@ def get_string_alignment(fst: pynini.Fst, input_text: str, symbol_table: pynini.
     Returns:
         output: list of tuples, each mapping input character to output
     """
-    lattice = pynini.shortestpath(input_text @ fst)
-    paths = lattice.paths(input_token_type=symbol_table, output_token_type=symbol_table)
-
-    ilabels = paths.ilabels()
-    olabels = paths.olabels()
-    logging.debug("input: " + paths.istring())
-    logging.debug("output: " + paths.ostring())
-    output = list(zip([symbol_table.find(x) for x in ilabels], [symbol_table.find(x) for x in olabels]))
-    logging.debug(f"alignment: {output}")
-    paths.next()
-    assert paths.done()
-    output_str = "".join(map(remove, [x[1] for x in output]))
-    return output, output_str
+    pass
 
 
 def _get_aligned_index(alignment: List[tuple], index: int):
     """
     Given index in contracted input string computes corresponding index in alignment (which has EPS)
     """
-    aligned_index = 0
-    idx = 0
-
-    while idx < index:
-        if alignment[aligned_index][0] != EPS:
-            idx += 1
-        aligned_index += 1
-    while alignment[aligned_index][0] == EPS:
-        aligned_index += 1
-    return aligned_index
+    pass
 
 
 def _get_original_index(alignment, aligned_index):
     """
     Given index in aligned output, returns corresponding index in contracted output string
     """
-
-    og_index = 0
-    idx = 0
-    while idx < aligned_index:
-        if alignment[idx][1] != EPS:
-            og_index += 1
-        idx += 1
-    return og_index
+    pass
 
 
 remove = lambda x: "" if x == EPS else " " if x == WHITE_SPACE else x
@@ -206,40 +138,7 @@ def indexed_map_to_output(alignment: List[tuple], start: int, end: int, mode: st
         output_og_start_index: inclusive start position in output string
         output_og_end_index: exclusive end position in output string
     """
-    # get aligned start and end of input substring
-
-    aligned_start = _get_aligned_index(alignment, start)
-    aligned_end = _get_aligned_index(alignment, end - 1)  # inclusive
-
-    logging.debug(f"0: |{list(map(remove, [x[0] for x in alignment[aligned_start:aligned_end+1]]))}|")
-    logging.debug(f"1: |{aligned_start}:{aligned_end+1}|")
-
-    # extend aligned_start to left
-
-    while (
-        aligned_start - 1 > 0
-        and alignment[aligned_start - 1][0] == EPS
-        and (alignment[aligned_start - 1][1] in tn_itn_symbols or alignment[aligned_start - 1][1] == EPS)
-    ):
-        aligned_start -= 1
-
-    while (
-        aligned_end + 1 < len(alignment)
-        and alignment[aligned_end + 1][0] == EPS
-        and (alignment[aligned_end + 1][1] in tn_itn_symbols or alignment[aligned_end + 1][1] == EPS)
-    ):
-        aligned_end += 1
-
-    if mode == TN_MODE:
-        while (aligned_end + 1) < len(alignment) and (
-            alignment[aligned_end + 1][1] in tn_itn_symbols or alignment[aligned_end + 1][1] == EPS
-        ):
-            aligned_end += 1
-
-    output_og_start_index = _get_original_index(alignment=alignment, aligned_index=aligned_start)
-    output_og_end_index = _get_original_index(alignment=alignment, aligned_index=aligned_end + 1)
-
-    return output_og_start_index, output_og_end_index
+    pass
 
 
 if __name__ == '__main__':

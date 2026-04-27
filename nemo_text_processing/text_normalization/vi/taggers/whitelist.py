@@ -22,9 +22,9 @@ from nemo_text_processing.text_normalization.vi.utils import get_abs_path, load_
 class WhiteListFst(GraphFst):
     """
     Finite state transducer for classifying whitelist for Vietnamese, e.g.
-        "h" -> tokens { name: "giờ" }
-        "p" -> tokens { name: "phút" }
-        "s" -> tokens { name: "giây" }
+        "h" -> tokens { name: "giá»�" }
+        "p" -> tokens { name: "phÃºt" }
+        "s" -> tokens { name: "giÃ¢y" }
     This class has highest priority among all classifier grammars. Whitelisted tokens are defined and loaded from "data/whitelist.tsv".
 
     Args:
@@ -38,11 +38,7 @@ class WhiteListFst(GraphFst):
         super().__init__(name="whitelist", kind="classify", deterministic=deterministic)
 
         def _get_whitelist_graph(input_case, file):
-            whitelist = load_labels(file)
-            if input_case == "lower_cased":
-                whitelist = [[x[0].lower()] + x[1:] for x in whitelist]
-            graph = pynini.string_map(whitelist)
-            return graph
+            pass
 
         graph = _get_whitelist_graph(input_case, get_abs_path("data/whitelist.tsv"))
         if not deterministic and input_case != "lower_cased":

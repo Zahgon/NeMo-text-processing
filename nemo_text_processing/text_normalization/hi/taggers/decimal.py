@@ -24,33 +24,21 @@ quantities = pynini.string_file(get_abs_path("data/numbers/thousands.tsv"))
 def get_quantity(decimal: 'pynini.FstLike', cardinal_up_to_hundred: 'pynini.FstLike') -> 'pynini.FstLike':
     """
     Returns FST that transforms either a cardinal or decimal followed by a quantity into a numeral,
-    e.g. १ लाख -> integer_part: "एक" quantity: "लाख"
-    e.g. १.५ लाख -> integer_part: "एक" fractional_part: "पाँच" quantity: "लाख"
+    e.g. à¥§ à¤²à¤¾à¤– -> integer_part: "à¤�à¤•" quantity: "à¤²à¤¾à¤–"
+    e.g. à¥§.à¥« à¤²à¤¾à¤– -> integer_part: "à¤�à¤•" fractional_part: "à¤ªà¤¾à¤�à¤š" quantity: "à¤²à¤¾à¤–"
 
     Args:
         decimal: decimal FST
         cardinal_up_to_hundred: cardinal FST
     """
-    numbers = cardinal_up_to_hundred
-
-    res = (
-        pynutil.insert("integer_part: \"")
-        + numbers
-        + pynutil.insert("\"")
-        + insert_space
-        + pynutil.insert("quantity: \"")
-        + quantities
-        + pynutil.insert("\"")
-    )
-    res |= decimal + insert_space + pynutil.insert("quantity: \"") + quantities + pynutil.insert("\"")
-    return res
+    pass
 
 
 class DecimalFst(GraphFst):
     """
     Finite state transducer for classifying decimal, e.g.
-        -१२.५००६ अरब -> decimal { negative: "true" integer_part: "बारह"  fractional_part: "पाँच शून्य शून्य छह" quantity: "अरब" }
-        १ अरब -> decimal { integer_part: "एक" quantity: "अरब" }
+        -à¥§à¥¨.à¥«à¥¦à¥¦à¥¬ à¤…à¤°à¤¬ -> decimal { negative: "true" integer_part: "à¤¬à¤¾à¤°à¤¹"  fractional_part: "à¤ªà¤¾à¤�à¤š à¤¶à¥‚à¤¨à¥�à¤¯ à¤¶à¥‚à¤¨à¥�à¤¯ à¤›à¤¹" quantity: "à¤…à¤°à¤¬" }
+        à¥§ à¤…à¤°à¤¬ -> decimal { integer_part: "à¤�à¤•" quantity: "à¤…à¤°à¤¬" }
 
     cardinal: CardinalFst
     """
